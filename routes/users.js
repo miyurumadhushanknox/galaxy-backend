@@ -8,7 +8,7 @@ const { authMiddleware, requireRole } = require('../middleware/auth');
 router.use(authMiddleware);
 
 // GET /api/users - list all users for this business
-router.get('/', requireRole('owner', 'admin', 'manager'), async (req, res) => {
+router.get('/', requireRole('owner', 'admin', 'manager', 'sales'), async (req, res) => {
   try {
     const { data, error } = await supabase
       .from('users')
