@@ -8,10 +8,8 @@ const { authMiddleware } = require('../middleware/auth');
 // POST /api/auth/login
 router.post('/login', async (req, res) => {
   try {
-    const { username, password, businessId } = req.body;
+    const { login, password } = req.body;
 
-    if (!username || !password || !businessId) {
-      return res.status(400).json({ error: 'Username, password and business ID are required' });
     }
 
     // Find user by username within this business
