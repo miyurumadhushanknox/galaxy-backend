@@ -135,7 +135,7 @@ router.put('/:id', requireRole('owner', 'admin'), async (req, res) => {
       .update(updateData)
       .eq('id', id)
       .eq('business_id', req.businessId)
-      .select('id, first_name, last_name, username, role, status')
+      .select('id, first_name, last_name, username, role, status, commission_on, commission_method, commission_percent, commission_per_unit, commission_min_cap_on, commission_min_cap')
       .single();
 
     if (error) throw error;
