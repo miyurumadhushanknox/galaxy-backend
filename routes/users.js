@@ -98,7 +98,7 @@ if (existingEmail) {
 router.put('/:id', requireRole('owner', 'admin'), async (req, res) => {
   try {
     const { id } = req.params;
-    const { firstName, lastName, email, role, status, commission, newPassword } = req.body;
+    const { firstName, lastName, username, email, role, status, commission, newPassword } = req.body;
 
     // Verify user belongs to this business
     const { data: existing } = await supabase
@@ -124,6 +124,7 @@ router.put('/:id', requireRole('owner', 'admin'), async (req, res) => {
     if (firstName) updateData.first_name = firstName.trim();
     if (lastName) updateData.last_name = lastName.trim();
     if (email) updateData.email = email.toLowerCase().trim();
+    if (username) updateData.username = username.toLowerCase().trim();
     if (role) updateData.role = role;
     if (status !== undefined) updateData.status = status;
     if (commission) {
