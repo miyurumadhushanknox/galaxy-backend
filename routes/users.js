@@ -12,7 +12,7 @@ router.get('/', requireRole('owner', 'admin', 'manager', 'sales'), async (req, r
   try {
     const { data, error } = await supabase
       .from('users')
-      .select('id, first_name, last_name, username, role, status, last_login, commission_on, commission_method, commission_percent, commission_per_unit, commission_min_cap_on, commission_min_cap, created_at')
+      .select('id, first_name, last_name, username, email, role, status, last_login, commission_on, commission_method, commission_percent, commission_per_unit, commission_min_cap_on, commission_min_cap, created_at')
       .eq('business_id', req.businessId)
       .order('created_at', { ascending: true });
 
@@ -27,9 +27,9 @@ router.get('/', requireRole('owner', 'admin', 'manager', 'sales'), async (req, r
 // POST /api/users - create new user
 router.post('/', requireRole('owner', 'admin'), async (req, res) => {
   try {
-    const { firstName, lastName, username, password, role, commission } = req.body;
+    const { firstName, lastName, email, username, password, role, commission } = req.body;
 
-    if (!firstName || !lastName || !username || !password || !role) {
+    if (!firstName || !email || !username || !password || !role) {
       return res.status(400).json({ error: 'All fields are required' });
     }
 
@@ -42,17 +42,27 @@ router.post('/', requireRole('owner', 'admin'), async (req, res) => {
       return res.status(400).json({ error: 'Invalid role' });
     }
 
-    // Check username not already taken in this business
-    const { data: existing } = await supabase
-      .from('users')
-      .select('id')
-      .eq('business_id', req.businessId)
-      .eq('username', username.toLowerCase().trim())
-      .single();
+    // Check username globally unique
+const { data: existingUsername } = await supabase
+  .from('users')
+  .select('id')
+  .eq('username', username.toLowerCase().trim())
+  .single();
 
-    if (existing) {
-      return res.status(409).json({ error: 'Username already taken' });
-    }
+if (existingUsername) {
+  return res.status(409).json({ error: 'Username already taken' });
+}
+
+// Check email globally unique
+const { data: existingEmail } = await supabase
+  .from('users')
+  .select('id')
+  .eq('email', email.toLowerCase().trim())
+  .single();
+
+if (existingEmail) {
+  return res.status(409).json({ error: 'Email already in use' });
+}
 
     const passwordHash = await bcrypt.hash(password, 10);
 
@@ -61,7 +71,8 @@ router.post('/', requireRole('owner', 'admin'), async (req, res) => {
       .insert({
         business_id: req.businessId,
         first_name: firstName.trim(),
-        last_name: lastName.trim(),
+        last_name: lastName ? lastName.trim() : '',
+        email: email.toLowerCase().trim(),
         username: username.toLowerCase().trim(),
         password_hash: passwordHash,
         role,
@@ -87,7 +98,7 @@ router.post('/', requireRole('owner', 'admin'), async (req, res) => {
 router.put('/:id', requireRole('owner', 'admin'), async (req, res) => {
   try {
     const { id } = req.params;
-    const { firstName, lastName, role, status, commission, newPassword } = req.body;
+    const { firstName, lastName, email, role, status, commission, newPassword } = req.body;
 
     // Verify user belongs to this business
     const { data: existing } = await supabase
@@ -112,6 +123,7 @@ router.put('/:id', requireRole('owner', 'admin'), async (req, res) => {
 
     if (firstName) updateData.first_name = firstName.trim();
     if (lastName) updateData.last_name = lastName.trim();
+    if (email) updateData.email = email.toLowerCase().trim();
     if (role) updateData.role = role;
     if (status !== undefined) updateData.status = status;
     if (commission) {
