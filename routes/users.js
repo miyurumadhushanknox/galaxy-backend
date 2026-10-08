@@ -116,7 +116,16 @@ router.put('/:id', requireRole('owner', 'admin'), async (req, res) => {
     if (existing.role === 'owner' && role && role !== 'owner') {
       return res.status(403).json({ error: 'Cannot change owner role' });
     }
-
+    if (email) {
+    const { data: emailCheck } = await supabase
+    .from('users')
+    .select('id')
+    .eq('email', email.toLowerCase().trim())
+    .eq('business_id', req.businessId)
+    .neq('id', id)
+    .single();
+    if (emailCheck) return res.status(400).json({ error: 'Email already in use' });
+    }
     const updateData = {
       updated_at: new Date().toISOString()
     };
