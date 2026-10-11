@@ -27,6 +27,26 @@ router.post('/', requireRole('owner', 'admin'), async (req, res) => {
     const { name, location } = req.body;
     if (!name) return res.status(400).json({ error: 'Name is required' });
 
+    // Check warehouse limit based on plan
+    const { data: business } = await supabase
+    .from('businesses')
+    .select('plan')
+    .eq('id', req.businessId)
+    .single();
+
+    const { count: whCount } = await supabase
+    .from('warehouses')
+    .select('*', { count: 'exact', head: true })
+    .eq('business_id', req.businessId);
+
+    const limits = { basic: 1, nova: 3, stellar: Infinity };
+    const plan = (business?.plan || 'basic').toLowerCase();
+    const limit = limits[plan] ?? 1;
+
+    if (whCount >= limit) {
+    return res.status(403).json({ error: `Your ${plan} plan allows only ${limit} warehouse${limit === 1 ? '' : 's'}. Upgrade to add more.` });
+    }
+
     const { data, error } = await supabase
       .from('warehouses')
       .insert({ business_id: req.businessId, name: name.trim(), location: location?.trim() })
