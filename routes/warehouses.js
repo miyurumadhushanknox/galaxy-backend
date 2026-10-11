@@ -39,12 +39,13 @@ router.post('/', requireRole('owner', 'admin'), async (req, res) => {
     .select('*', { count: 'exact', head: true })
     .eq('business_id', req.businessId);
 
-    const limits = { basic: 1, nova: 3, stellar: Infinity };
+    const limits = { basic: 1, nova: 3, monthly2k: 1, monthly5k: 3, stellar: Infinity };
     const plan = (business?.plan || 'basic').toLowerCase();
     const limit = limits[plan] ?? 1;
 
     if (whCount >= limit) {
-    return res.status(403).json({ error: `Your ${plan} plan allows only ${limit} warehouse${limit === 1 ? '' : 's'}. Upgrade to add more.` });
+    const planDisplay = { basic: 'Basic', nova: 'Nova', monthly2k: 'Nova', monthly5k: 'Nova', stellar: 'Stellar' };
+    return res.status(403).json({ error: `Your ${planDisplay[plan] || plan} plan allows only ${limit} warehouse${limit === 1 ? '' : 's'}. Upgrade to add more.` });
     }
 
     const { data, error } = await supabase
