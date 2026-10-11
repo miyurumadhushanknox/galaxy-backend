@@ -71,8 +71,14 @@ router.post('/login', async (req, res) => {
         lastName: user.last_name,
         role: user.role,
         businessId: user.business_id
-      }
-    });
+          },
+      business: {
+      id: business.id,
+      name: business.name,
+      plan: business.plan,
+      trialEndsAt: business.trial_ends_at
+    }
+  });
 
   } catch (err) {
     console.error('Login error:', err);
