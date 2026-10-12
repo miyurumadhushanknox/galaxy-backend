@@ -72,11 +72,12 @@ router.post('/login', async (req, res) => {
         role: user.role,
         businessId: user.business_id
           },
-      business: {
-      id: business.id,
-      name: business.name,
-      plan: business.plan,
-      trialEndsAt: business.trial_ends_at
+        business: {
+        id: business.id,
+        name: business.name,
+        plan: business.plan,
+        trialEndsAt: business.trial_ends_at,
+        trialStartsAt: business.trial_starts_at
     }
   });
 
