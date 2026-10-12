@@ -86,7 +86,7 @@ router.post('/clients', async (req, res) => {
       .insert({
         name: businessName.trim(),
         phone: phone.trim(),
-        owner_email: ownerEmail ? ownerEmail.toLowerCase().trim() : null,
+        owner_email: null,
         category: category ? category.trim() : null,
         address: address ? address.trim() : null,
         plan: plan || 'monthly2k',
