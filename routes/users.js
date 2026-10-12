@@ -39,9 +39,28 @@ router.post('/', requireRole('owner', 'admin'), async (req, res) => {
 
     const validRoles = ['admin', 'manager', 'sales', 'stockkeeper', 'delivery', 'accountant'];
     if (!validRoles.includes(role)) {
+      
       return res.status(400).json({ error: 'Invalid role' });
     }
+       // Check user limit by plan
+    const { data: business } = await supabase
+      .from('businesses')
+      .select('plan')
+      .eq('id', req.businessId)
+      .single();
 
+    const userLimits = { basic: 3, nova: 7, monthly2k: 3, monthly5k: 7, stellar: Infinity, unlimited: Infinity };
+    const plan = (business?.plan || 'basic').toLowerCase();
+    const limit = userLimits[plan] ?? 3;
+
+    const { count: userCount } = await supabase
+      .from('users')
+      .select('*', { count: 'exact', head: true })
+      .eq('business_id', req.businessId);
+
+    if (userCount >= limit) {
+      return res.status(403).json({ error: `Your plan allows only ${limit} users. Upgrade to add more.` });
+    }
     // Check username globally unique
 const { data: existingUsername } = await supabase
   .from('users')
