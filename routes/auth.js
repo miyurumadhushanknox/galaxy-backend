@@ -77,8 +77,10 @@ router.post('/login', async (req, res) => {
         name: business.name,
         plan: business.plan,
         trialEndsAt: business.trial_ends_at,
-        trialStartsAt: business.trial_starts_at
-    }
+        trialStartsAt: business.trial_starts_at,
+        category: business.category,
+        address: business.address
+       }
   });
 
   } catch (err) {
