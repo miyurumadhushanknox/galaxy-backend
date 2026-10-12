@@ -71,9 +71,9 @@ router.get('/clients', async (req, res) => {
 router.post('/clients', async (req, res) => {
   try {
     const {
-      businessName, contact, phone, email,
-      plan, start, setupMethod, trial, notes,
-      ownerUsername, ownerPassword
+      businessName, category, address, phone,
+      plan, start, setupMethod, trial,
+      ownerFirstName, ownerLastName, ownerEmail, ownerUsername, ownerPassword
     } = req.body;
 
     if (!businessName || !phone || !ownerUsername || !ownerPassword) {
@@ -86,18 +86,20 @@ router.post('/clients', async (req, res) => {
       .insert({
         name: businessName.trim(),
         phone: phone.trim(),
-        owner_email: email ? email.toLowerCase().trim() : null,
+        owner_email: ownerEmail ? ownerEmail.toLowerCase().trim() : null,
+        category: category ? category.trim() : null,
+        address: address ? address.trim() : null,
         plan: plan || 'monthly2k',
         is_active: true,
         is_blocked: false,
         trial_ends_at: trial ? new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString() : null,
-        knox_contact: contact || '',
+        knox_contact: '',
         knox_start_date: start || new Date().toISOString().slice(0, 10),
         knox_setup_method: setupMethod || 'full',
         knox_setup_paid: [false, false, false, false],
         knox_sub_payments: {},
         knox_sub_amounts: {},
-        knox_notes: notes || ''
+        knox_notes: ''
       })
       .select()
       .single();
@@ -110,12 +112,13 @@ router.post('/clients', async (req, res) => {
       .from('users')
       .insert({
         business_id: business.id,
-        first_name: businessName.trim(),
-        last_name: '',
+        first_name: (ownerFirstName || businessName).trim(),
+        last_name: ownerLastName ? ownerLastName.trim() : '',
         username: ownerUsername.toLowerCase().trim(),
         password_hash: passwordHash,
         role: 'owner',
-        status: true
+        status: true,
+        email: ownerEmail ? ownerEmail.toLowerCase().trim() : null
       });
 
     if (userError) throw userError;
