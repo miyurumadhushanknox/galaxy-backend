@@ -106,6 +106,32 @@ router.post('/clients', async (req, res) => {
 
     if (bizError) throw bizError;
 
+    // Check duplicate username
+    const { data: existingUsername } = await supabase
+      .from('users')
+      .select('id')
+      .eq('username', ownerUsername.toLowerCase().trim())
+      .maybeSingle();
+
+    if (existingUsername) {
+      await supabase.from('businesses').delete().eq('id', business.id);
+      return res.status(409).json({ error: 'Username already taken. Choose a different username.' });
+    }
+
+    // Check duplicate email
+    if (email) {
+      const { data: existingEmail } = await supabase
+        .from('businesses')
+        .select('id')
+        .eq('owner_email', email.toLowerCase().trim())
+        .maybeSingle();
+
+      if (existingEmail) {
+        await supabase.from('businesses').delete().eq('id', business.id);
+        return res.status(409).json({ error: 'Email already registered. Use a different email.' });
+      }
+    }
+
     // Create owner user
     const passwordHash = await bcrypt.hash(ownerPassword, 10);
     const { error: userError } = await supabase
