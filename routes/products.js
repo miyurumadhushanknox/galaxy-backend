@@ -77,7 +77,27 @@ router.post('/', requireRole('owner', 'admin', 'manager', 'stockkeeper'), async 
     if (existing) {
       return res.status(409).json({ error: 'Product code already exists' });
     }
+        // Check product limit by plan
+    const { data: business } = await supabase
+      .from('businesses')
+      .select('plan')
+      .eq('id', req.businessId)
+      .single();
 
+    const productLimits = { basic: 500, nova: Infinity, monthly2k: 500, monthly5k: Infinity, stellar: Infinity, unlimited: Infinity };
+    const plan = (business?.plan || 'basic').toLowerCase();
+    const limit = productLimits[plan] ?? 500;
+
+    if (limit !== Infinity) {
+      const { count: productCount } = await supabase
+        .from('products')
+        .select('*', { count: 'exact', head: true })
+        .eq('business_id', req.businessId);
+
+      if (productCount >= limit) {
+        return res.status(403).json({ error: `Your plan allows only ${limit} products. Upgrade to add more.` });
+      }
+    }
     // Create product
     const { data: product, error } = await supabase
       .from('products')
