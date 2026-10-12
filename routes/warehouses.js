@@ -39,7 +39,7 @@ router.post('/', requireRole('owner', 'admin'), async (req, res) => {
     .select('*', { count: 'exact', head: true })
     .eq('business_id', req.businessId);
 
-    const limits = { basic: 1, nova: 3, monthly2k: 1, monthly5k: 3, stellar: Infinity };
+    const limits = { basic: 1, nova: 3, monthly2k: 1, monthly5k: 3, stellar: Infinity, unlimited: Infinity };
     const plan = (business?.plan || 'basic').toLowerCase();
     const limit = limits[plan] ?? 1;
 
