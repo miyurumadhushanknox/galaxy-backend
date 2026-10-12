@@ -44,7 +44,7 @@ router.post('/', requireRole('owner', 'admin'), async (req, res) => {
     const limit = limits[plan] ?? 1;
 
     if (whCount >= limit) {
-    const planDisplay = { basic: 'Basic', nova: 'Nova', monthly2k: 'Nova', monthly5k: 'Nova', stellar: 'Stellar' };
+    const planDisplay = { basic: 'Basic', nova: 'Nova', monthly2k: 'Basic', monthly5k: 'Nova', stellar: 'Stellar', unlimited: 'Stellar' };
     return res.status(403).json({ error: `Your ${planDisplay[plan] || plan} plan allows only ${limit} warehouse${limit === 1 ? '' : 's'}. Upgrade to add more.` });
     }
 
