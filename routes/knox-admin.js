@@ -208,7 +208,23 @@ router.put('/clients/:id', async (req, res) => {
       .single();
 
     if (error) throw error;
-    res.json({ client: data });
+
+    // Update owner user's email/username if provided
+   const { ownerEmail, ownerUsername } = req.body;
+   if (ownerEmail || ownerUsername) {
+   const userUpdates = {};
+   if (ownerEmail) userUpdates.email = ownerEmail.toLowerCase().trim();
+   if (ownerUsername) userUpdates.username = ownerUsername.toLowerCase().trim();
+
+  const { error: userError } = await supabase
+    .from('users')
+    .update(userUpdates)
+    .eq('business_id', id);
+
+  if (userError) throw userError;
+}
+
+res.json({ client: data });
   } catch (err) {
     console.error('Knox update client error:', err);
     res.status(500).json({ error: 'Server error' });
