@@ -61,12 +61,12 @@ router.get('/clients', async (req, res) => {
     // Fetch owner usernames from users table
     const { data: users } = await supabase
     .from('users')
-    .select('business_id, username')
+    .select('business_id, username, email')
     .eq('role', 'owner');
 
     const usersMap = {};
-    (users || []).forEach(u => { usersMap[u.business_id] = u.username; });
-    const result = (businesses || []).map(b => ({ ...b, owner_username: usersMap[b.id] || '' }));
+    (users || []).forEach(u => { usersMap[u.business_id] = u; });
+    const result = (businesses || []).map(b => ({ ...b, owner_username: usersMap[b.id]?.username || '', owner_email: usersMap[b.id]?.email || b.owner_email || '' }));
     
     res.json({ clients: result || [] });
   } catch (err) {
