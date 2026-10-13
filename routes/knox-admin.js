@@ -53,12 +53,22 @@ router.get('/clients', async (req, res) => {
   try {
     const { data: businesses, error } = await supabase
       .from('businesses')
-      .select('id, name, phone, owner_email, plan, is_active, is_blocked, trial_ends_at, created_at, knox_notes, knox_setup_method, knox_setup_paid, knox_sub_payments, knox_sub_amounts, knox_contact, knox_start_date')
+      .select('id, name, category, address, phone, owner_email, plan, is_active, is_blocked, trial_ends_at, created_at, knox_notes, knox_setup_method, knox_setup_paid, knox_sub_payments, knox_sub_amounts, knox_contact, knox_start_date')
       .order('created_at', { ascending: false });
 
     if (error) throw error;
 
-    res.json({ clients: businesses || [] });
+    // Fetch owner usernames from users table
+    const { data: users } = await supabase
+    .from('users')
+    .select('business_id, username')
+    .eq('role', 'owner');
+
+    const usersMap = {};
+    (users || []).forEach(u => { usersMap[u.business_id] = u.username; });
+    const result = (businesses || []).map(b => ({ ...b, owner_username: usersMap[b.id] || '' }));
+    
+    res.json({ clients: result || [] });
   } catch (err) {
     console.error('Knox list clients error:', err);
     res.status(500).json({ error: 'Server error' });
