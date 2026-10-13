@@ -222,9 +222,31 @@ router.put('/clients/:id', async (req, res) => {
     // Update owner user's email/username if provided
    const { ownerEmail, ownerUsername } = req.body;
    if (ownerEmail || ownerUsername) {
-   const userUpdates = {};
-   if (ownerEmail) userUpdates.email = ownerEmail.toLowerCase().trim();
-   if (ownerUsername) userUpdates.username = ownerUsername.toLowerCase().trim();
+  // Check duplicate username
+  if (ownerUsername) {
+    const { data: existingUsername } = await supabase
+      .from('users')
+      .select('id')
+      .eq('username', ownerUsername.toLowerCase().trim())
+      .neq('business_id', id)
+      .maybeSingle();
+    if (existingUsername) return res.status(409).json({ error: 'Username already taken. Choose a different username.' });
+  }
+
+  // Check duplicate email
+  if (ownerEmail) {
+    const { data: existingEmail } = await supabase
+      .from('users')
+      .select('id')
+      .eq('email', ownerEmail.toLowerCase().trim())
+      .neq('business_id', id)
+      .maybeSingle();
+    if (existingEmail) return res.status(409).json({ error: 'Email already registered. Use a different email.' });
+  }
+
+  const userUpdates = {};
+  if (ownerEmail) userUpdates.email = ownerEmail.toLowerCase().trim();
+  if (ownerUsername) userUpdates.username = ownerUsername.toLowerCase().trim();
 
   const { error: userError } = await supabase
     .from('users')
