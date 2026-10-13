@@ -263,6 +263,46 @@ res.json({ client: data });
   }
 });
 
+// ──────────────────────────────────────────
+// POST /api/knox-admin/clients/:id/cancel-trial
+// ──────────────────────────────────────────
+router.post('/clients/:id/cancel-trial', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { error } = await supabase
+      .from('businesses')
+      .update({ trial_ends_at: new Date().toISOString(), is_blocked: true })
+      .eq('id', id);
+    if (error) throw error;
+    res.json({ ok: true });
+  } catch (err) {
+    console.error('Knox cancel trial error:', err);
+    res.status(500).json({ error: err.message || 'Server error' });
+  }
+});
+
+// ──────────────────────────────────────────
+// POST /api/knox-admin/clients/:id/activate-plan
+// ──────────────────────────────────────────
+router.post('/clients/:id/activate-plan', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { plan } = req.body;
+    if (!plan) return res.status(400).json({ error: 'Plan is required' });
+    const { data, error } = await supabase
+      .from('businesses')
+      .update({ plan, trial_ends_at: null, is_blocked: false, is_active: true })
+      .eq('id', id)
+      .select()
+      .single();
+    if (error) throw error;
+    res.json({ client: data });
+  } catch (err) {
+    console.error('Knox activate plan error:', err);
+    res.status(500).json({ error: err.message || 'Server error' });
+  }
+});
+
 // ═══════════════════════════════════════════════════
 // GET /api/knox-admin/stats — dashboard summary stats
 // ═══════════════════════════════════════════════════
