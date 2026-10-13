@@ -119,11 +119,11 @@ router.post('/clients', async (req, res) => {
     }
 
     // Check duplicate email
-    if (email) {
+    if (ownerEmail) {
       const { data: existingEmail } = await supabase
         .from('businesses')
         .select('id')
-        .eq('owner_email', email.toLowerCase().trim())
+        .eq('owner_email', ownerEmail.toLowerCase().trim())
         .maybeSingle();
 
       if (existingEmail) {
