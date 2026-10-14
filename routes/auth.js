@@ -91,5 +91,20 @@ router.post('/login', async (req, res) => {
     res.status(500).json({ error: 'Server error' });
   }
 });
+// GET /api/auth/me - check current session business status
+const { authenticateToken } = require('../middleware/auth');
+router.get('/me', authenticateToken, async (req, res) => {
+  try {
+    const { data: business, error } = await supabase
+      .from('businesses')
+      .select('id, name, plan, is_blocked, is_active, trial_ends_at')
+      .eq('id', req.user.businessId)
+      .single();
+    if (error || !business) return res.status(404).json({ error: 'Business not found' });
+    res.json({ business });
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
 
 module.exports = router;
