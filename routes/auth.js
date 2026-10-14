@@ -81,6 +81,7 @@ router.post('/login', async (req, res) => {
         plan: business.plan,
         trialEndsAt: business.trial_ends_at,
         trialStartsAt: business.trial_starts_at,
+        knoxStartDate: business.knox_start_date,
         category: business.category,
         address: business.address
        }
