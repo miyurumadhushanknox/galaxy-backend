@@ -46,10 +46,6 @@ const authMiddleware = async (req, res, next) => {
       return res.status(401).json({ error: 'Business not found' });
     }
 
-    if (business.is_blocked) {
-      return res.status(403).json({ error: 'Account is blocked. Please contact KNOX support.' });
-    }
-
     if (!business.is_active) {
       return res.status(403).json({ error: 'Account is inactive.' });
     }
