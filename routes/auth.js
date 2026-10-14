@@ -100,6 +100,7 @@ router.get('/me', authMiddleware, async (req, res) => {
       .eq('id', req.user.businessId)
       .single();
     if (error || !business) return res.status(404).json({ error: 'Business not found' });
+    if (business.is_blocked) { return res.json({ business, isBlocked: true }); }
     res.json({ business });
   } catch (err) {
     res.status(500).json({ error: 'Server error' });
