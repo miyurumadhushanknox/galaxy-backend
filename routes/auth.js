@@ -43,8 +43,11 @@ router.post('/login', async (req, res) => {
       .eq('id', user.business_id)
       .single();
 
-    if (!business || business.is_blocked) {
-      return res.status(403).json({ error: 'Account is blocked. Contact KNOX support.' });
+    if (!business) {
+    return res.status(403).json({ error: 'Business not found.' });
+    }
+    if (business.is_blocked) {
+    return res.status(403).json({ error: 'Account is blocked. Contact KNOX support.', isBlocked: true, business });
     }
 
     if (business.plan === 'trial') {
