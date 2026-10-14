@@ -102,7 +102,7 @@ router.get('/me', authMiddleware, async (req, res) => {
       .single();
     if (error || !business) return res.status(404).json({ error: 'Business not found' });
     if (business.is_blocked) { return res.json({ business, isBlocked: true }); }
-    res.json({ business });
+    res.json({ business, knoxStartDate: business.knox_start_date });
   } catch (err) {
     res.status(500).json({ error: 'Server error' });
   }
