@@ -61,6 +61,7 @@ if (business.plan === 'trial' && req.path !== '/me') {
     // Attach user and business info to request
     req.user = user;
     req.user.businessId = decoded.businessId;
+    req.businessId = decoded.businessId;  // ← add this back too
 
     next();
   } catch (err) {
