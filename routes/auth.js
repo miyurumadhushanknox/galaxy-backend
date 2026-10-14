@@ -92,8 +92,8 @@ router.post('/login', async (req, res) => {
   }
 });
 // GET /api/auth/me - check current session business status
-const { authenticateToken } = require('../middleware/auth');
-router.get('/me', authenticateToken, async (req, res) => {
+const { authMiddleware } = require('../middleware/auth');
+router.get('/me', authMiddleware, async (req, res) => {
   try {
     const { data: business, error } = await supabase
       .from('businesses')
