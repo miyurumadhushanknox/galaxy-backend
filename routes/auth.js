@@ -100,7 +100,7 @@ router.get('/me', authMiddleware, async (req, res) => {
       .select('id, name, plan, is_blocked, is_active, trial_ends_at, knox_start_date')
       .eq('id', req.user.businessId)
       .single();
-    if (error || !business) return res.status(404).json({ error: 'Business not found' });
+    if (error || !business) return res.status(404).json({ error: 'Business not found', debug: error?.message, businessId: req.user.businessId });
     if (business.is_blocked) { return res.json({ business, isBlocked: true }); }
     res.json({ business, knoxStartDate: business.knox_start_date });
   } catch (err) {
