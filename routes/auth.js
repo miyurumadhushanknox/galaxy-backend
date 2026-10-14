@@ -97,12 +97,34 @@ router.get('/me', authMiddleware, async (req, res) => {
   try {
     const { data: business, error } = await supabase
       .from('businesses')
-      .select('id, name, plan, is_blocked, is_active, trial_ends_at, knox_start_date')
+      .select('id, name, plan, is_blocked, is_active, trial_ends_at, knox_start_date, next_due_date')
       .eq('id', req.user.businessId)
       .single();
     if (error || !business) return res.status(404).json({ error: 'Business not found', debug: error?.message, businessId: req.user.businessId });
     if (business.is_blocked) { return res.json({ business, isBlocked: true }); }
-    res.json({ business, knoxStartDate: business.knox_start_date });
+
+// Calculate next renewal date
+var nextDueDate = null;
+if (business.knox_start_date) {
+  var start = new Date(business.knox_start_date);
+  var isYearly = business.plan && business.plan.indexOf('yearly') !== -1;
+  var now = new Date();
+  var candidate;
+  if (isYearly) {
+    candidate = new Date(start.getFullYear() + 1, start.getMonth(), start.getDate());
+    while (candidate <= now) candidate = new Date(candidate.getFullYear() + 1, candidate.getMonth(), candidate.getDate());
+  } else {
+    candidate = new Date(now.getFullYear(), now.getMonth(), start.getDate());
+    if (candidate <= now) candidate = new Date(now.getFullYear(), now.getMonth() + 1, start.getDate());
+  }
+  var mm = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  nextDueDate = candidate.getDate() + ' ' + mm[candidate.getMonth()] + ' ' + candidate.getFullYear();
+  // Save to Supabase
+  var isoStr = candidate.getFullYear()+'-'+String(candidate.getMonth()+1).padStart(2,'0')+'-'+String(candidate.getDate()).padStart(2,'0');
+  await supabase.from('businesses').update({ next_due_date: isoStr }).eq('id', business.id);
+}
+
+res.json({ business, knoxStartDate: business.knox_start_date, nextDueDate });
   } catch (err) {
     res.status(500).json({ error: 'Server error' });
   }
