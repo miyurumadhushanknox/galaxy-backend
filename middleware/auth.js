@@ -50,13 +50,13 @@ const authMiddleware = async (req, res, next) => {
       return res.status(403).json({ error: 'Account is inactive.' });
     }
 
-    // Check trial expiry
-    if (business.plan === 'trial') {
-      const trialEnd = new Date(business.trial_ends_at);
-      if (new Date() > trialEnd) {
-        return res.status(403).json({ error: 'Trial period has ended. Please upgrade your plan.' });
-      }
-    }
+    // Check trial expiry (skip for /me route)
+if (business.plan === 'trial' && req.path !== '/me') {
+  const trialEnd = new Date(business.trial_ends_at);
+  if (new Date() > trialEnd) {
+    return res.status(403).json({ error: 'Trial period has ended. Please upgrade your plan.' });
+  }
+}
 
     // Attach user and business info to request
     req.user = user;
