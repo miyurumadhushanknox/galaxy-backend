@@ -85,10 +85,12 @@ router.get('/clients', async (req, res) => {
     }
     var isoStr = candidate.getFullYear()+'-'+String(candidate.getMonth()+1).padStart(2,'0')+'-'+String(candidate.getDate()).padStart(2,'0');
     await supabase.from('businesses').update({ next_due_date: isoStr }).eq('id', b.id);
+    b.next_due_date = isoStr;
     }
     }
 
     res.json({ clients: result || [] });
+    
   } catch (err) {
     console.error('Knox list clients error:', err);
     res.status(500).json({ error: 'Server error' });
