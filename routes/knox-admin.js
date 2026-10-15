@@ -68,6 +68,25 @@ router.get('/clients', async (req, res) => {
     (users || []).forEach(u => { usersMap[u.business_id] = u; });
     const result = (businesses || []).map(b => ({ ...b, owner_username: usersMap[b.id]?.username || '', owner_email: usersMap[b.id]?.email || b.owner_email || '' }));
     
+    // Calculate and save next_due_date for all clients
+    for (const b of (businesses || [])) {
+    if (b.knox_start_date) {
+    var start = new Date(b.knox_start_date);
+    var isYearly = b.plan && b.plan.indexOf('yearly') !== -1;
+    var now = new Date();
+    var candidate;
+    if (isYearly) {
+      candidate = new Date(start.getFullYear() + 1, start.getMonth(), start.getDate());
+      while (candidate <= now) candidate = new Date(candidate.getFullYear() + 1, candidate.getMonth(), candidate.getDate());
+    } else {
+      candidate = new Date(now.getFullYear(), now.getMonth(), start.getDate());
+      if (candidate <= now) candidate = new Date(now.getFullYear(), now.getMonth() + 1, start.getDate());
+    }
+    var isoStr = candidate.getFullYear()+'-'+String(candidate.getMonth()+1).padStart(2,'0')+'-'+String(candidate.getDate()).padStart(2,'0');
+    await supabase.from('businesses').update({ next_due_date: isoStr }).eq('id', b.id);
+    }
+    }
+
     res.json({ clients: result || [] });
   } catch (err) {
     console.error('Knox list clients error:', err);
