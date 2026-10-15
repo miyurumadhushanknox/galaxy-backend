@@ -448,5 +448,25 @@ router.put('/announcements', async (req, res) => {
     res.status(500).json({ error: 'Server error' });
   }
 });
-
+// ——————————————————————————————————————
+// DELETE /api/knox-admin/clients/:id — delete a client and all their data
+// ——————————————————————————————————————
+router.delete('/clients/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const tables = [
+      'order_items','orders','products','categories',
+      'delivery_methods','payment_methods','business_settings','users'
+    ];
+    for (const table of tables) {
+      await supabase.from(table).delete().eq('business_id', id);
+    }
+    const { error } = await supabase.from('businesses').delete().eq('id', id);
+    if (error) throw error;
+    res.json({ ok: true });
+  } catch (err) {
+    console.error('Knox delete client error:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
 module.exports = router;
