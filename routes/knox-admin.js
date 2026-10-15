@@ -473,4 +473,21 @@ router.delete('/clients/:id', async (req, res) => {
     res.status(500).json({ error: 'Server error' });
   }
 });
+// GET /api/knox-admin/orders?business_id=xxx
+router.get('/orders', async (req, res) => {
+  try {
+    const { business_id, limit = 9999 } = req.query;
+    if(!business_id) return res.status(400).json({ error: 'business_id required' });
+    const { data, error } = await supabase
+      .from('orders')
+      .select('*')
+      .eq('business_id', business_id)
+      .limit(parseInt(limit));
+    if(error) throw error;
+    res.json(data);
+  } catch(err) {
+    console.error('Knox admin get orders error:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
 module.exports = router;
