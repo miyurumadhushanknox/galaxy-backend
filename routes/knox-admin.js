@@ -286,7 +286,8 @@ if (data && data.knox_start_date) {
     while (candidate <= now) candidate = new Date(candidate.getFullYear() + 1, candidate.getMonth(), candidate.getDate());
   } else {
     candidate = new Date(now.getFullYear(), now.getMonth(), start.getDate());
-    if (candidate <= now) candidate = new Date(now.getFullYear(), now.getMonth() + 1, start.getDate());
+    var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    if (candidate < today) candidate = new Date(now.getFullYear(), now.getMonth() + 1, start.getDate());
   }
   var isoStr = candidate.getFullYear()+'-'+String(candidate.getMonth()+1).padStart(2,'0')+'-'+String(candidate.getDate()).padStart(2,'0');
   await supabase.from('businesses').update({ next_due_date: isoStr }).eq('id', id);
