@@ -97,7 +97,7 @@ router.get('/me', authMiddleware, async (req, res) => {
   try {
     const { data: business, error } = await supabase
       .from('businesses')
-      .select('id, name, plan, is_blocked, is_active, trial_ends_at, knox_start_date, next_due_date, knox_sub_payments, knox_plan_amount, setup_paid')
+      .select('id, name, plan, is_blocked, is_active, trial_ends_at, knox_start_date, next_due_date, knox_sub_payments, knox_plan_amount, knox_setup_paid')
       .eq('id', req.user.businessId)
       .single();
     if (error || !business) return res.status(404).json({ error: 'Business not found', debug: error?.message, businessId: req.user.businessId });
