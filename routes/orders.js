@@ -248,9 +248,10 @@ router.put('/:id/status', requireRole('owner', 'admin', 'manager', 'sales', 'del
     const { data, error } = await supabase
       .from('orders')
       .update({
-        status,
-        cancel_reason: reason || null,
-        updated_at: new Date().toISOString()
+      status,
+      cancel_reason: reason || null,
+      updated_at: new Date().toISOString(),
+      delivered_at: status === 'delivered' ? new Date().toISOString() : undefined
       })
       .eq('id', req.params.id)
       .eq('business_id', req.businessId)
