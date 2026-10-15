@@ -69,7 +69,7 @@ router.get('/clients', async (req, res) => {
     const result = (businesses || []).map(b => ({ ...b, owner_username: usersMap[b.id]?.username || '', owner_email: usersMap[b.id]?.email || b.owner_email || '' }));
     
     // Calculate and save next_due_date for all clients
-    for (const b of (businesses || [])) {
+    for (const b of (result || [])) {
     if (b.knox_start_date) {
     var start = new Date(b.knox_start_date);
     var isYearly = b.plan && b.plan.indexOf('yearly') !== -1;
