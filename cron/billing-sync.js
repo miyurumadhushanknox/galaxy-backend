@@ -23,7 +23,7 @@ async function syncAllBilling() {
       const now = new Date();
       const subAmounts = biz.knox_sub_amounts || {};
       const subPayments = biz.knox_sub_payments || {};
-      const setupPaid = biz.knox_setup_paid || [false, false, false, false];
+      const setupPaid = biz.knox_setup_paid || {};
 
       // Fill sub_amounts for all past months
       let d = new Date(start.getFullYear(), start.getMonth(), 1);
