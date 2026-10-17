@@ -210,7 +210,7 @@ router.put('/clients/:id', async (req, res) => {
     const allowed = [
       'name', 'phone', 'owner_email', 'plan', 'is_active', 'is_blocked',
       'trial_ends_at', 'knox_contact', 'knox_start_date', 'knox_setup_method',
-      'knox_setup_paid', 'knox_sub_payments', 'knox_sub_amounts', 'knox_notes'
+      'knox_setup_paid', 'knox_sub_payments', 'knox_sub_amounts', 'knox_notes', 'knox_outstanding'
     ];
 
     // Map incoming camelCase to DB columns
@@ -220,7 +220,7 @@ router.put('/clients/:id', async (req, res) => {
       trialEndsAt: 'trial_ends_at', contact: 'knox_contact',
       start: 'knox_start_date', setupMethod: 'knox_setup_method',
       setupPaid: 'knox_setup_paid', subPayments: 'knox_sub_payments',
-      subAmounts: 'knox_sub_amounts', notes: 'knox_notes'
+      subAmounts: 'knox_sub_amounts', notes: 'knox_notes', outstanding: 'knox_outstanding'
     };
 
     Object.entries(req.body).forEach(([key, val]) => {
