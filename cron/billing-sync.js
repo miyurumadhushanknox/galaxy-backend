@@ -1,9 +1,11 @@
 const supabase = require('../config/supabase');
 
 const PLANS = {
-  basic: { type: 'monthly', amount: 2000 },
-  nova: { type: 'monthly', amount: 5000 },
-  stellar: { type: 'perorder', amount: 7 },
+  monthly2k: { type: 'monthly', amount: 2000 },
+  monthly5k: { type: 'monthly', amount: 5000 },
+  yearly2k: { type: 'yearly', amount: 2000 },
+  yearly5k: { type: 'yearly', amount: 5000 },
+  unlimited: { type: 'perorder', amount: 7 },
 };
 
 async function syncAllBilling() {
