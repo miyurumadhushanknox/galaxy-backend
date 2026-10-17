@@ -54,7 +54,6 @@ await supabase.from('businesses').update({
   knox_setup_outstanding: setupOutstanding,
   knox_sub_amounts: subAmounts,
   knox_sub_payments: subPayments,
-  knox_setup_outstanding: setupOutstanding,
   knox_outstanding: setupOutstanding + subOutstanding
 }).eq('id', biz.id);
     }
