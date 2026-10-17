@@ -39,7 +39,10 @@ async function syncAllBilling() {
         firstMonth = false;
         d = new Date(d.getFullYear(), d.getMonth() + 1, 1);
       }
-
+      // Fill missing months in subPayments as false
+      Object.keys(subAmounts).forEach(k => {
+      if (subPayments[k] === undefined) subPayments[k] = false;
+      });
       // Calculate outstanding
 
 let subOutstanding = 0;
@@ -48,7 +51,9 @@ Object.keys(subPayments).forEach(k => {
 });
 
 await supabase.from('businesses').update({
+  knox_setup_outstanding: setupOutstanding,
   knox_sub_amounts: subAmounts,
+  knox_sub_payments: subPayments,
   knox_setup_outstanding: setupOutstanding,
   knox_outstanding: setupOutstanding + subOutstanding
 }).eq('id', biz.id);
