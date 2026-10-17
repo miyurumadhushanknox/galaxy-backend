@@ -3,8 +3,8 @@ const supabase = require('../config/supabase');
 const PLANS = {
   monthly2k: { type: 'monthly', amount: 2000 },
   monthly5k: { type: 'monthly', amount: 5000 },
-  yearly2k: { type: 'yearly', amount: 2000 },
-  yearly5k: { type: 'yearly', amount: 5000 },
+  yearly2k: { type: 'yearly', amount: 20000 },
+yearly5k: { type: 'yearly', amount: 50000 },
   unlimited: { type: 'perorder', amount: 7 },
 };
 
@@ -30,21 +30,26 @@ async function syncAllBilling() {
       const subAmounts = biz.knox_sub_amounts || {};
       const subPayments = biz.knox_sub_payments || {};
 
-      // Fill sub_amounts for all past months
-      let d = new Date(start.getFullYear(), start.getMonth(), 1);
-      let firstMonth = true;
-      while (d <= now) {
-        const key = d.toISOString().slice(0, 7);
-        if (!firstMonth && (!subAmounts[key] || subAmounts[key] === 0)) {
-          subAmounts[key] = plan.amount;
-        }
-        firstMonth = false;
-        d = new Date(d.getFullYear(), d.getMonth() + 1, 1);
-      }
-      // Fill missing months in subPayments as false
-      Object.keys(subAmounts).forEach(k => {
-      if (subPayments[k] === undefined) subPayments[k] = false;
-      });
+      // Fill sub_amounts for all past periods
+let d = new Date(start.getFullYear(), start.getMonth(), 1);
+let firstMonth = true;
+while (d <= now) {
+  const key = plan.type === 'yearly'
+    ? String(d.getFullYear())
+    : d.toISOString().slice(0, 7);
+
+  if (!firstMonth) {
+    if (!subAmounts[key] || subAmounts[key] === 0) {
+      subAmounts[key] = plan.amount;
+    }
+    if (subPayments[key] === undefined) subPayments[key] = false;
+  }
+
+  firstMonth = false;
+  d = plan.type === 'yearly'
+    ? new Date(d.getFullYear() + 1, d.getMonth(), 1)
+    : new Date(d.getFullYear(), d.getMonth() + 1, 1);
+}
       // Calculate outstanding
 
 let subOutstanding = 0;
