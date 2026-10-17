@@ -23,7 +23,7 @@ async function syncAllBilling() {
       const now = new Date();
       const subAmounts = biz.knox_sub_amounts || {};
       const subPayments = biz.knox_sub_payments || {};
-      const setupPaid = biz.knox_setup_paid || {};
+      const setupPaid = biz.knox_setup_paid || [false, false, false, false];
 
       // Fill sub_amounts for all past months
       let d = new Date(start.getFullYear(), start.getMonth(), 1);
@@ -38,16 +38,19 @@ async function syncAllBilling() {
       }
 
       // Calculate outstanding
-      let outstanding = 0;
-      setupPaid.forEach(p => { if (!p) outstanding += 5000; });
-      Object.keys(subPayments).forEach(k => {
-      if (subPayments[k] === false) outstanding += subAmounts[k] || 0;
-      });
+let setupOutstanding = 0;
+setupPaid.forEach(p => { if (!p) setupOutstanding += 5000; });
 
-      await supabase.from('businesses').update({
-        knox_sub_amounts: subAmounts,
-        knox_outstanding: outstanding
-      }).eq('id', biz.id);
+let subOutstanding = 0;
+Object.keys(subPayments).forEach(k => {
+  if (subPayments[k] === false) subOutstanding += subAmounts[k] || 0;
+});
+
+await supabase.from('businesses').update({
+  knox_sub_amounts: subAmounts,
+  knox_setup_outstanding: setupOutstanding,
+  knox_outstanding: setupOutstanding + subOutstanding
+}).eq('id', biz.id);
     }
     console.log('✅ Billing sync done');
   } catch (e) {
