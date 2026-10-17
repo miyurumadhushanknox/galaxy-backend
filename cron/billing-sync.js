@@ -38,10 +38,12 @@ while (d <= now) {
     ? String(d.getFullYear())
     : d.toISOString().slice(0, 7);
 
-  if (!subAmounts[key] || subAmounts[key] === 0) {
-  subAmounts[key] = firstMonth && plan.type === 'monthly' ? 0 : plan.amount;
-}
-if (subPayments[key] === undefined) subPayments[key] = false;
+  if (firstMonth && plan.type === 'monthly') {
+  subAmounts[key] = 0;
+  } else if (!subAmounts[key]) {
+  subAmounts[key] = plan.amount;
+  }
+  if (subPayments[key] === undefined) subPayments[key] = false;
 
   firstMonth = false;
   d = plan.type === 'yearly'
