@@ -74,6 +74,8 @@ app.use('/api/settings', require('./routes/settings'));
 app.use('/api/dashboard', require('./routes/dashboard'));
 app.use('/api/knox-admin', require('./routes/knox-admin'));
 
+require('./cron/billing-sync');
+
 // Health check
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', service: 'Galaxy API', timestamp: new Date().toISOString() });
