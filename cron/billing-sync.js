@@ -1,4 +1,4 @@
-const supabase = require('../lib/supabase');
+const supabase = require('../config/supabase');
 
 const PLANS = {
   basic: { type: 'monthly', amount: 2000 },
