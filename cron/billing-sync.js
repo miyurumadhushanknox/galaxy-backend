@@ -40,8 +40,8 @@ async function syncAllBilling() {
       // Calculate outstanding
       let outstanding = 0;
       setupPaid.forEach(p => { if (!p) outstanding += 5000; });
-      Object.keys(subPayments).forEach(k => {
-        if (!subPayments[k]) outstanding += subAmounts[k] || 0;
+      Object.keys(subAmounts).forEach(k => {
+      if (!subPayments[k]) outstanding += subAmounts[k] || 0;
       });
 
       await supabase.from('businesses').update({
