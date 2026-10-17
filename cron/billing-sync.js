@@ -23,7 +23,47 @@ async function syncAllBilling() {
       await supabase.from('businesses').update({ knox_setup_outstanding: setupOutstanding }).eq('id', biz.id);
       if (!biz.knox_start_date) continue;
       const plan = PLANS[biz.plan];
-      if (!plan || plan.type === 'perorder') continue;
+      if (!plan) continue;
+
+if (plan.type === 'perorder') {
+  const start = new Date(biz.knox_start_date);
+  const now = new Date();
+  const subAmounts = biz.knox_sub_amounts || {};
+  const subPayments = biz.knox_sub_payments || {};
+
+  let d = new Date(start.getFullYear(), start.getMonth(), 1);
+  while (d <= now) {
+    const key = d.toISOString().slice(0, 7);
+    const monthStart = new Date(d.getFullYear(), d.getMonth(), 1).toISOString();
+    const monthEnd = new Date(d.getFullYear(), d.getMonth() + 1, 1).toISOString();
+
+    const { count } = await supabase
+      .from('orders')
+      .select('*', { count: 'exact', head: true })
+      .eq('business_id', biz.id)
+      .eq('status', 'completed')
+      .gte('created_at', monthStart)
+      .lt('created_at', monthEnd);
+
+    subAmounts[key] = (count || 0) * 7;
+    if (subPayments[key] === undefined) subPayments[key] = false;
+
+    d = new Date(d.getFullYear(), d.getMonth() + 1, 1);
+  }
+
+  let subOutstanding = 0;
+  Object.keys(subPayments).forEach(k => {
+    if (subPayments[k] === false) subOutstanding += subAmounts[k] || 0;
+  });
+
+  await supabase.from('businesses').update({
+    knox_setup_outstanding: setupOutstanding,
+    knox_sub_amounts: subAmounts,
+    knox_sub_payments: subPayments,
+    knox_outstanding: setupOutstanding + subOutstanding
+  }).eq('id', biz.id);
+  continue;
+}
 
       const start = new Date(biz.knox_start_date);
       const now = new Date();
