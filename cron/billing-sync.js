@@ -41,7 +41,7 @@ if (plan.type === 'perorder') {
       .from('orders')
       .select('*', { count: 'exact', head: true })
       .eq('business_id', biz.id)
-      .eq('status', 'completed')
+      .eq('status', 'delivered')
       .gte('created_at', monthStart)
       .lt('created_at', monthEnd);
 
