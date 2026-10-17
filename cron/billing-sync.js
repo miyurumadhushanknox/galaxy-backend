@@ -34,9 +34,9 @@ if (plan.type === 'perorder') {
   let d = new Date(start.getFullYear(), start.getMonth(), 1);
   while (d <= now) {
     const key = d.toISOString().slice(0, 7);
-    const monthStart = new Date(d.getFullYear(), d.getMonth(), 1).toISOString();
-    const monthEnd = new Date(d.getFullYear(), d.getMonth() + 1, 1).toISOString();
-
+    const startDay = start.getDate();
+    const monthStart = new Date(d.getFullYear(), d.getMonth(), startDay).toISOString();
+    const monthEnd = new Date(d.getFullYear(), d.getMonth() + 1, startDay).toISOString();
     const { count } = await supabase
       .from('orders')
       .select('*', { count: 'exact', head: true })
