@@ -56,7 +56,7 @@ async function syncAllBilling() {
 }
 
 // Run every hour
-syncAllBilling();
 setInterval(syncAllBilling, 60 * 60 * 1000);
+syncAllBilling();
 
 module.exports = syncAllBilling;
