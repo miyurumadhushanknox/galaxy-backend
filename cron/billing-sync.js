@@ -80,10 +80,11 @@ while (d <= now) {
 
   if (firstMonth && plan.type === 'monthly') {
   subAmounts[key] = 0;
-  } else if (!subAmounts[key]) {
+  subPayments[key] = true;
+} else if (!subAmounts[key]) {
   subAmounts[key] = plan.amount;
-  }
-  if (subPayments[key] === undefined) subPayments[key] = false;
+}
+if (subPayments[key] === undefined) subPayments[key] = false;
 
   firstMonth = false;
   d = plan.type === 'yearly'
