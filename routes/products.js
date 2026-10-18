@@ -385,13 +385,14 @@ router.delete('/:id', requireRole('owner', 'admin'), async (req, res) => {
     if (error) throw error;
 
     // Log history - product deleted
-    await supabase.from('stock_history').insert({
-      business_id: req.businessId,
-      product_id: req.params.id,
-      user_id: req.user.id,
-      action: 'delete',
-      note: `Product deleted: ${prod?.name || req.params.id}`
+    const { error: delHistErr } = await supabase.from('stock_history').insert({
+    business_id: req.businessId,
+    product_id: req.params.id,
+    user_id: req.user?.id || null,
+    action: 'delete',
+    note: `Product deleted: ${prod?.name || req.params.id} | Code: ${prod?.code || ''}`
     });
+    if (delHistErr) console.error('Delete history error:', delHistErr);
 
     res.json({ message: 'Product deleted' });
   } catch (err) {
