@@ -128,7 +128,14 @@ router.post('/', requireRole('owner', 'admin', 'manager', 'stockkeeper'), async 
     // Log history – new product created
     const firstStockLevel = stock_levels && stock_levels.length > 0 ? stock_levels[0] : null;
     const totalQty = stock_levels ? stock_levels.reduce((sum, sl) => sum + (parseInt(sl.quantity) || 0), 0) : 0;
-    const warehouseQtyNote = stock_levels ? stock_levels.map(sl => `${sl.warehouse_id}:${parseInt(sl.quantity)||0}`).join(',') : '';
+    let warehouseQtyNote = '';
+      if (stock_levels && stock_levels.length > 0) {
+    const whIds = stock_levels.map(sl => sl.warehouse_id);
+    const { data: whData } = await supabase.from('warehouses').select('id, name').in('id', whIds);
+    const whMap = {};
+      if (whData) whData.forEach(w => whMap[w.id] = w.name);
+    warehouseQtyNote = stock_levels.map(sl => `${whMap[sl.warehouse_id] || sl.warehouse_id}:${parseInt(sl.quantity)||0}`).join(', ');
+    }
     const { error: histErr } = await supabase.from('stock_history').insert({
       business_id: req.businessId,
       product_id: product.id,
