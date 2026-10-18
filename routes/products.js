@@ -29,6 +29,7 @@ let creatorMap = {};
 if (creatorIds.length > 0) {
   const { data: users } = await supabase.from('users').select('id, first_name, last_name').in('id', creatorIds);
   if (users) users.forEach(u => creatorMap[u.id] = (u.first_name||'') + ' ' + (u.last_name||'').trim());
+  console.log('creatorMap:', creatorMap);
 }
 const productsWithCreator = products.map(p => ({ ...p, creator_name: creatorMap[p.created_by] || null }));
 res.json(productsWithCreator);
