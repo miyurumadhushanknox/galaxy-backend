@@ -123,8 +123,15 @@ router.post('/', requireRole('owner', 'admin', 'manager', 'stockkeeper'), async 
         warehouse_id: sl.warehouse_id,
         quantity: parseInt(sl.quantity) || 0
       }));
-      await supabase.from('stock_levels').insert(stockInserts);
     }
+      // Log history - new product created
+    await supabase.from('stock_history').insert({
+      business_id: req.businessId,
+      product_id: product.id,
+      user_id: req.user.id,
+      action: 'create',
+      note: `Product created: ${product.name}`
+    });
 
     res.status(201).json(product);
   } catch (err) {
@@ -345,7 +352,15 @@ router.get('/:id/history', async (req, res) => {
 
 // DELETE /api/products/:id
 router.delete('/:id', requireRole('owner', 'admin'), async (req, res) => {
-  try {
+    try {
+    // Get product name before deleting
+    const { data: prod } = await supabase
+      .from('products')
+      .select('name, code')
+      .eq('id', req.params.id)
+      .eq('business_id', req.businessId)
+      .single();
+
     const { error } = await supabase
       .from('products')
       .delete()
@@ -353,7 +368,34 @@ router.delete('/:id', requireRole('owner', 'admin'), async (req, res) => {
       .eq('business_id', req.businessId);
 
     if (error) throw error;
+
+    // Log history - product deleted
+    await supabase.from('stock_history').insert({
+      business_id: req.businessId,
+      product_id: req.params.id,
+      user_id: req.user.id,
+      action: 'delete',
+      note: `Product deleted: ${prod?.name || req.params.id}`
+    });
+
     res.json({ message: 'Product deleted' });
+  } catch (err) {
+    console.error('Delete product error:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// GET /api/products/history/all - all stock history for business
+router.get('/history/all', async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from('stock_history')
+      .select('*, products(name, code), warehouses(name), users(first_name, last_name)')
+      .eq('business_id', req.businessId)
+      .order('created_at', { ascending: false })
+      .limit(200);
+    if (error) throw error;
+    res.json(data);
   } catch (err) {
     res.status(500).json({ error: 'Server error' });
   }
