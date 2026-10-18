@@ -129,7 +129,7 @@ router.post('/', requireRole('owner', 'admin', 'manager', 'stockkeeper'), async 
     await supabase.from('stock_history').insert({
       business_id: req.businessId,
       product_id: product.id,
-      user_id: req.user.id,
+      user_id: req.user?.id || null,
       action: 'create',
       note: `Product created: ${product.name}`
     });
