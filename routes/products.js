@@ -135,7 +135,7 @@ router.post('/', requireRole('owner', 'admin', 'manager', 'stockkeeper'), async 
     quantity_change: firstStockLevel ? parseInt(firstStockLevel.quantity) || 0 : null,
     quantity_after: firstStockLevel ? parseInt(firstStockLevel.quantity) || 0 : null,
     warehouse_id: firstStockLevel ? firstStockLevel.warehouse_id : null,
-    note: `Product created: ${product.name} | Purchase: ${req.body.purchasePrice || 0} | Sale: ${req.body.sellingPrice || 0}`
+    note: `Product created: ${product.name} | Purchase: ${req.body.purchasePrice || req.body.purchase_price || 0} | Sale: ${req.body.sellingPrice || req.body.selling_price || 0}`
     });
     if (histErr) console.error('History insert error:', histErr);
 
