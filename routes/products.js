@@ -27,7 +27,8 @@ router.get('/', async (req, res) => {
 const creatorIds = [...new Set(products.filter(p=>p.created_by).map(p=>p.created_by))];
 let creatorMap = {};
 if (creatorIds.length > 0) {
-  const { data: users } = await supabase.from('users').select('id, first_name, last_name').in('id', creatorIds);
+  const { data: users, error: usersErr } = await supabase.from('users').select('id, first_name, last_name').in('id', creatorIds);
+  console.log('creatorIds:', creatorIds, 'users:', users, 'err:', usersErr);
   if (users) users.forEach(u => creatorMap[u.id] = (u.first_name||'') + ' ' + (u.last_name||'').trim());
   console.log('creatorMap:', creatorMap);
 }
