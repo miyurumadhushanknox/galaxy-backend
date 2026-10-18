@@ -11,19 +11,27 @@ router.get('/', async (req, res) => {
     const { data: products, error } = await supabase
       .from('products')
       .select(`
-      *,
-      stock_levels (
-      quantity,
-      warehouse_id,
-      warehouses ( id, name, location )
-      ),
-      users ( id, name )
-      `)
+  *,
+  stock_levels (
+    quantity,
+    warehouse_id,
+    warehouses ( id, name, location )
+  )
+`)
       .eq('business_id', req.businessId)
       .order('created_at', { ascending: false });
 
     if (error) throw error;
-    res.json(products);
+
+// Fetch creator names
+const creatorIds = [...new Set(products.filter(p=>p.created_by).map(p=>p.created_by))];
+let creatorMap = {};
+if (creatorIds.length > 0) {
+  const { data: users } = await supabase.from('users').select('id, name').in('id', creatorIds);
+  if (users) users.forEach(u => creatorMap[u.id] = u.name);
+}
+const productsWithCreator = products.map(p => ({ ...p, creator_name: creatorMap[p.created_by] || null }));
+res.json(productsWithCreator);
   } catch (err) {
     console.error('Get products error:', err);
     res.status(500).json({ error: 'Server error' });
