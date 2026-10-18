@@ -123,6 +123,7 @@ router.post('/', requireRole('owner', 'admin', 'manager', 'stockkeeper'), async 
         warehouse_id: sl.warehouse_id,
         quantity: parseInt(sl.quantity) || 0
       }));
+      await supabase.from('stock_levels').insert(stockInserts);
     }
       // Log history - new product created
     await supabase.from('stock_history').insert({
