@@ -125,16 +125,20 @@ router.post('/', requireRole('owner', 'admin', 'manager', 'stockkeeper'), async 
       }));
       await supabase.from('stock_levels').insert(stockInserts);
     }
-      // Log history - new product created
+    // Log history – new product created
+    const firstStockLevel = stock_levels && stock_levels.length > 0 ? stock_levels[0] : null;
     const { error: histErr } = await supabase.from('stock_history').insert({
-      business_id: req.businessId,
-      product_id: product.id,
-      user_id: req.user?.id || null,
-      action: 'create',
-      note: `Product created: ${product.name}`
+    business_id: req.businessId,
+    product_id: product.id,
+    user_id: req.user?.id || null,
+    action: 'create',
+    quantity_change: firstStockLevel ? parseInt(firstStockLevel.quantity) || 0 : null,
+    quantity_after: firstStockLevel ? parseInt(firstStockLevel.quantity) || 0 : null,
+    warehouse_id: firstStockLevel ? firstStockLevel.warehouse_id : null,
+    note: `Product created: ${product.name} | Purchase: ${req.body.purchasePrice || 0} | Sale: ${req.body.sellingPrice || 0}`
     });
     if (histErr) console.error('History insert error:', histErr);
-    
+
     res.status(201).json(product);
   } catch (err) {
     console.error('Create product error:', err);
