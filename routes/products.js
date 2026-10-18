@@ -120,6 +120,7 @@ router.post('/', requireRole('owner', 'admin', 'manager', 'stockkeeper'), async 
   purchase_price: purchase_price,
   low_stock_threshold: low_stock_threshold || 5,
   images: images || [],
+  description: req.body.description || req.body.desc || null,
   created_by: req.user?.id || null,
 })
       .select()
