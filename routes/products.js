@@ -127,15 +127,17 @@ router.post('/', requireRole('owner', 'admin', 'manager', 'stockkeeper'), async 
     }
     // Log history – new product created
     const firstStockLevel = stock_levels && stock_levels.length > 0 ? stock_levels[0] : null;
+    const totalQty = stock_levels ? stock_levels.reduce((sum, sl) => sum + (parseInt(sl.quantity) || 0), 0) : 0;
+    const warehouseQtyNote = stock_levels ? stock_levels.map(sl => `${sl.warehouse_id}:${parseInt(sl.quantity)||0}`).join(',') : '';
     const { error: histErr } = await supabase.from('stock_history').insert({
-    business_id: req.businessId,
-    product_id: product.id,
-    user_id: req.user?.id || null,
-    action: 'create',
-    quantity_change: firstStockLevel ? parseInt(firstStockLevel.quantity) || 0 : null,
-    quantity_after: firstStockLevel ? parseInt(firstStockLevel.quantity) || 0 : null,
-    warehouse_id: firstStockLevel ? firstStockLevel.warehouse_id : null,
-    note: `Product created: ${product.name} | Purchase: ${req.body.purchasePrice || req.body.purchase_price || 0} | Sale: ${req.body.sellingPrice || req.body.selling_price || 0}`
+      business_id: req.businessId,
+      product_id: product.id,
+      user_id: req.user?.id || null,
+      action: 'create',
+      quantity_change: totalQty,
+      quantity_after: totalQty,
+      warehouse_id: firstStockLevel ? firstStockLevel.warehouse_id : null,
+      note: `Product created: ${product.name} | Purchase: ${req.body.purchasePrice || req.body.purchase_price || 0} | Sale: ${req.body.sellingPrice || req.body.selling_price || 0} | Warehouses: ${warehouseQtyNote}`
     });
     if (histErr) console.error('History insert error:', histErr);
 
