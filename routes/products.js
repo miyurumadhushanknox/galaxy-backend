@@ -108,6 +108,7 @@ router.post('/', requireRole('owner', 'admin', 'manager', 'stockkeeper'), async 
   selling_price: selling_price,
   purchase_price: purchase_price,
   low_stock_threshold: low_stock_threshold || 5,
+  images: images || [],
 })
       .select()
       .single();
