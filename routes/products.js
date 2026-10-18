@@ -11,12 +11,13 @@ router.get('/', async (req, res) => {
     const { data: products, error } = await supabase
       .from('products')
       .select(`
-        *,
-        stock_levels (
-          quantity,
-          warehouse_id,
-          warehouses ( id, name, location )
-        )
+      *,
+      stock_levels (
+      quantity,
+      warehouse_id,
+      warehouses ( id, name, location )
+      ),
+      users ( id, name )
       `)
       .eq('business_id', req.businessId)
       .order('created_at', { ascending: false });
@@ -109,6 +110,7 @@ router.post('/', requireRole('owner', 'admin', 'manager', 'stockkeeper'), async 
   purchase_price: purchase_price,
   low_stock_threshold: low_stock_threshold || 5,
   images: images || [],
+  created_by: req.user?.id || null,
 })
       .select()
       .single();
