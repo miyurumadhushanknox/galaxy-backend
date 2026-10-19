@@ -67,7 +67,7 @@ router.get('/:id', async (req, res) => {
 // POST /api/products - create product
 router.post('/', requireRole('owner', 'admin', 'manager', 'stockkeeper'), async (req, res) => {
   try {
-    const { name, sku, selling_price, purchase_price, low_stock_threshold, stock_levels, images, description, is_active } = req.body;
+    const { name, sku, selling_price, purchase_price, low_stock_threshold, stock_levels, images, description, is_active, weight } = req.body;
     const code = sku;
     const sellingPrice = selling_price;
     const purchasePrice = purchase_price;
@@ -121,6 +121,7 @@ router.post('/', requireRole('owner', 'admin', 'manager', 'stockkeeper'), async 
   low_stock_threshold: low_stock_threshold || 5,
   images: images || [],
   description: req.body.description || req.body.desc || null,
+  weight: req.body.weight || 0,
   created_by: req.user?.id || null,
 })
       .select()
