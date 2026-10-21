@@ -185,6 +185,7 @@ router.put('/:id', requireRole('owner', 'admin', 'manager', 'stockkeeper'), asyn
     if (req.body.weight !== undefined) updateData.weight = req.body.weight;
     if (req.body.images !== undefined) updateData.images = req.body.images;
 
+    
     const { data, error } = await supabase
       .from('products')
       .update(updateData)
