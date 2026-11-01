@@ -181,7 +181,7 @@ router.put('/:id', requireRole('owner', 'admin', 'manager', 'stockkeeper'), asyn
     if (lowStockThreshold !== undefined) updateData.low_stock_threshold = lowStockThreshold;
     if (isActive !== undefined) updateData.is_active = isActive;
     if (req.body.description !== undefined) updateData.description = req.body.description;
-    if (req.body.sku !== undefined) updateData.sku = req.body.sku;
+    if (req.body.sku !== undefined) updateData.product_code = req.body.sku;
     if (req.body.weight !== undefined) updateData.weight = req.body.weight;
     if (req.body.images !== undefined) updateData.images = req.body.images;
 
