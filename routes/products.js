@@ -182,6 +182,7 @@ router.put('/:id', requireRole('owner', 'admin', 'manager', 'stockkeeper'), asyn
     if (isActive !== undefined) updateData.is_active = isActive;
     if (req.body.description !== undefined) updateData.description = req.body.description;
     if (req.body.sku !== undefined) updateData.code = req.body.sku;
+    
     if (req.body.weight !== undefined) updateData.weight = req.body.weight;
     if (req.body.images !== undefined) updateData.images = req.body.images;
 
