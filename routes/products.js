@@ -122,6 +122,7 @@ router.post('/', requireRole('owner', 'admin', 'manager', 'stockkeeper'), async 
   images: images || [],
   description: req.body.description || req.body.desc || null,
   weight: req.body.weight || 0,
+  is_active: is_active !== undefined ? is_active : true,
   created_by: req.user?.id || null,
 })
       .select()
