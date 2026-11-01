@@ -131,3 +131,21 @@ res.json({ business, knoxStartDate: business.knox_start_date, nextDueDate });
 });
 
 module.exports = router;
+
+// POST /api/auth/forgot-password
+router.post("/forgot-password", async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email) return res.status(400).json({ error: "Email is required" });
+    const { data: user } = await supabase.from("users").select("*").eq("email", email).single();
+    if (!user) return res.status(200).json({ message: "If this email exists, a reset link was sent." });
+    const token = jwt.sign({ userId: user.id, email }, process.env.JWT_SECRET, { expiresIn: "1h" });
+    const { sendPasswordResetEmail } = require("../email");
+    await sendPasswordResetEmail(email, token);
+    res.json({ message: "Password reset email sent!" });
+  } catch (err) {
+    console.error("Forgot password error:", err);
+    res.status(500).json({ error: "Server error" });
+  }
+});
+module.exports = router;
