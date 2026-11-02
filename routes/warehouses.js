@@ -24,7 +24,7 @@ router.get('/', async (req, res) => {
 // POST /api/warehouses
 router.post('/', requireRole('owner', 'admin'), async (req, res) => {
   try {
-    const { name, location, manager } = req.body;
+    const { name, location, manager, capacity, type } = req.body;
     if (!name) return res.status(400).json({ error: 'Name is required' });
 
     // Check warehouse limit based on plan
@@ -50,7 +50,7 @@ router.post('/', requireRole('owner', 'admin'), async (req, res) => {
 
     const { data, error } = await supabase
       .from('warehouses')
-      .insert({ business_id: req.businessId, name: name.trim(), location: location?.trim(), manager: manager?.trim() || null })
+      .insert({ business_id: req.businessId, name: name.trim(), location: location?.trim(), manager: manager?.trim() || null, capacity: capacity || null, type: type || null })
       .select()
       .single();
 
