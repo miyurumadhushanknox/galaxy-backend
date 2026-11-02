@@ -15,7 +15,7 @@ router.get('/', async (req, res) => {
   stock_levels (
     quantity,
     warehouse_id,
-    warehouses ( id, name, location )
+    warehouses ( id, name, location, manager, capacity, type, code )
   )
 `)
       .eq('business_id', req.businessId)
@@ -50,7 +50,7 @@ router.get('/:id', async (req, res) => {
         stock_levels (
           quantity,
           warehouse_id,
-          warehouses ( id, name, location )
+          warehouses ( id, name, location, manager, capacity, type, code )
         )
       `)
       .eq('id', req.params.id)
