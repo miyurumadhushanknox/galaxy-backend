@@ -64,12 +64,15 @@ router.post('/', requireRole('owner', 'admin'), async (req, res) => {
 // PUT /api/warehouses/:id
 router.put('/:id', requireRole('owner', 'admin'), async (req, res) => {
   try {
-    const { name, location, isActive, capacity } = req.body;
+    const { name, location, isActive, capacity, manager, type, code } = req.body;
     const updateData = {};
     if (name) updateData.name = name.trim();
     if (location !== undefined) updateData.location = location.trim();
     if (isActive !== undefined) updateData.is_active = isActive;
     if (capacity !== undefined) updateData.capacity = capacity;
+    if (manager !== undefined) updateData.manager = manager?.trim() || null;
+    if (type !== undefined) updateData.type = type;
+    if (code !== undefined) updateData.code = code?.trim() || null;
 
     const { data, error } = await supabase
       .from('warehouses')
