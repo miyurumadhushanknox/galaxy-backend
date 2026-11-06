@@ -82,12 +82,12 @@ router.put('/business', requireRole('owner', 'admin'), async (req, res) => {
 // POST /api/settings/delivery-methods
 router.post('/delivery-methods', requireRole('owner', 'admin'), async (req, res) => {
   try {
-    const { name, price } = req.body;
+    const { name, price, apiKey, manualPrice, pricingMode, provincePrices, districtPrices } = req.body;
     if (!name) return res.status(400).json({ error: 'Name is required' });
 
     const { data, error } = await supabase
       .from('delivery_methods')
-      .insert({ business_id: req.businessId, name: name.trim(), price: price || 0 })
+      .insert({ business_id: req.businessId, name: name.trim(), price: price || 0, api_key: apiKey||null, manual_price: manualPrice||false, pricing_mode: pricingMode||'province', province_prices: provincePrices||{}, district_prices: districtPrices||{} })
       .select()
       .single();
 
@@ -101,11 +101,16 @@ router.post('/delivery-methods', requireRole('owner', 'admin'), async (req, res)
 // PUT /api/settings/delivery-methods/:id
 router.put('/delivery-methods/:id', requireRole('owner', 'admin'), async (req, res) => {
   try {
-    const { name, price, isActive } = req.body;
+    const { name, price, isActive, apiKey, manualPrice, pricingMode, provincePrices, districtPrices } = req.body;
     const updateData = {};
     if (name) updateData.name = name.trim();
     if (price !== undefined) updateData.price = price;
     if (isActive !== undefined) updateData.is_active = isActive;
+    if (apiKey !== undefined) updateData.api_key = apiKey;
+    if (manualPrice !== undefined) updateData.manual_price = manualPrice;
+    if (pricingMode !== undefined) updateData.pricing_mode = pricingMode;
+    if (provincePrices !== undefined) updateData.province_prices = provincePrices;
+    if (districtPrices !== undefined) updateData.district_prices = districtPrices;
 
     const { data, error } = await supabase
       .from('delivery_methods')
