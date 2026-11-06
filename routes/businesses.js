@@ -72,18 +72,6 @@ router.post('/register', async (req, res) => {
       business_id: business.id
     });
 
-    // Create default delivery methods
-    await supabase.from('delivery_methods').insert([
-      { business_id: business.id, name: 'No Delivery', price: 0, sort_order: 0 },
-      { business_id: business.id, name: 'Koombiyo', price: 400, sort_order: 1 }
-    ]);
-
-    // Create default payment methods
-    await supabase.from('payment_methods').insert([
-      { business_id: business.id, name: 'Cash', sort_order: 0 },
-      { business_id: business.id, name: 'Bank Transfer', sort_order: 1 }
-    ]);
-
     res.status(201).json({
       business: { id: business.id, name: business.name, plan: business.plan },
       owner: user,
