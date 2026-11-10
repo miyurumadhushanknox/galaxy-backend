@@ -169,12 +169,13 @@ router.delete('/payment-methods/:id', requireRole('owner', 'admin'), async (req,
 // PUT /api/settings/payment-methods/:id
 router.put('/payment-methods/:id', requireRole('owner', 'admin'), async (req, res) => {
   try {
-    const { name, serviceCharge, absorbCost, isActive } = req.body;
+    const { name, serviceCharge, absorbCost, isActive, config } = req.body;
     const updateData = {};
     if (name) updateData.name = name.trim();
     if (serviceCharge !== undefined) updateData.service_charge = serviceCharge;
     if (absorbCost !== undefined) updateData.absorb_cost = absorbCost;
     if (isActive !== undefined) updateData.is_active = isActive;
+    if (config !== undefined) updateData.config = config;
     const { data, error } = await supabase.from('payment_methods').update(updateData).eq('id', req.params.id).eq('business_id', req.businessId).select().single();
     if (error) throw error;
     res.json(data);
