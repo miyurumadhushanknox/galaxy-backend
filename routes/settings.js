@@ -140,12 +140,12 @@ router.delete('/delivery-methods/:id', requireRole('owner', 'admin'), async (req
 // POST /api/settings/payment-methods
 router.post('/payment-methods', requireRole('owner', 'admin'), async (req, res) => {
   try {
-    const { name } = req.body;
+    const { name, serviceCharge, absorbCost } = req.body;
     if (!name) return res.status(400).json({ error: 'Name is required' });
 
     const { data, error } = await supabase
       .from('payment_methods')
-      .insert({ business_id: req.businessId, name: name.trim() })
+      .insert({ business_id: req.businessId, name: name.trim(), service_charge: serviceCharge||0, absorb_cost: absorbCost||false })
       .select()
       .single();
 
@@ -161,6 +161,22 @@ router.delete('/payment-methods/:id', requireRole('owner', 'admin'), async (req,
   try {
     await supabase.from('payment_methods').delete().eq('id', req.params.id).eq('business_id', req.businessId);
     res.json({ message: 'Deleted' });
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// PUT /api/settings/payment-methods/:id
+router.put('/payment-methods/:id', requireRole('owner', 'admin'), async (req, res) => {
+  try {
+    const { name, serviceCharge, absorbCost } = req.body;
+    const updateData = {};
+    if (name) updateData.name = name.trim();
+    if (serviceCharge !== undefined) updateData.service_charge = serviceCharge;
+    if (absorbCost !== undefined) updateData.absorb_cost = absorbCost;
+    const { data, error } = await supabase.from('payment_methods').update(updateData).eq('id', req.params.id).eq('business_id', req.businessId).select().single();
+    if (error) throw error;
+    res.json(data);
   } catch (err) {
     res.status(500).json({ error: 'Server error' });
   }
