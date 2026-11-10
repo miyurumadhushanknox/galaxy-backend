@@ -16,6 +16,25 @@ router.get('/', async (req, res) => {
       supabase.from('discount_codes').select('*').eq('business_id', req.businessId)
     ]);
 
+    // Auto-seed system payment methods if missing
+    const existingTypes = (paymentRes.data || []).map(p => p.type);
+    const systemTypes = [
+      { name: 'Cash', type: 'cash', sort_order: 1 },
+      { name: 'Card', type: 'card', sort_order: 2 },
+      { name: 'Cash on Delivery', type: 'cod', sort_order: 3 },
+      { name: 'Bank Deposit', type: 'bank_deposit', sort_order: 4 },
+      { name: 'Koko Pay', type: 'koko_pay', sort_order: 5 },
+      { name: 'Mint Pay', type: 'mint_pay', sort_order: 6 },
+    ];
+    const missing = systemTypes.filter(t => !existingTypes.includes(t.type));
+    if (missing.length > 0) {
+      await supabase.from('payment_methods').insert(
+        missing.map(t => ({ business_id: req.businessId, name: t.name, type: t.type, is_active: false, sort_order: t.sort_order, service_charge: 0, absorb_cost: false, config: {} }))
+      );
+      const { data: refreshed } = await supabase.from('payment_methods').select('*').eq('business_id', req.businessId).order('sort_order');
+      paymentRes.data = refreshed;
+    }
+
     res.json({
       settings: settingsRes.data,
       business: bizRes.data,
