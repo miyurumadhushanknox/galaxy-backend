@@ -72,14 +72,6 @@ router.post('/register', async (req, res) => {
       business_id: business.id
     });
 
-    // Seed default system payment methods
-    await supabase.from('payment_methods').insert([
-      { business_id: business.id, name: 'Cash', type: 'cash', is_active: false, sort_order: 1, service_charge: 0, absorb_cost: false, config: {} },
-      { business_id: business.id, name: 'Card', type: 'card', is_active: false, sort_order: 2, service_charge: 0, absorb_cost: false, config: {} },
-      { business_id: business.id, name: 'Cash on Delivery', type: 'cod', is_active: false, sort_order: 3, service_charge: 0, absorb_cost: false, config: {} },
-      { business_id: business.id, name: 'Bank Deposit', type: 'bank_deposit', is_active: false, sort_order: 4, service_charge: 0, absorb_cost: false, config: {} },
-    ]);
-
     res.status(201).json({
       business: { id: business.id, name: business.name, plan: business.plan },
       owner: user,
