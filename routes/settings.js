@@ -164,7 +164,7 @@ router.post('/payment-methods', requireRole('owner', 'admin'), async (req, res) 
 
     const { data, error } = await supabase
       .from('payment_methods')
-      .insert({ business_id: req.businessId, name: name.trim(), service_charge: serviceCharge||0, absorb_cost: absorbCost||false })
+      .insert({ business_id: req.businessId, name: name.trim(), service_charge: serviceCharge||0, pay_by_customer: payByCustomer||false })
       .select()
       .single();
 
@@ -188,11 +188,11 @@ router.delete('/payment-methods/:id', requireRole('owner', 'admin'), async (req,
 // PUT /api/settings/payment-methods/:id
 router.put('/payment-methods/:id', requireRole('owner', 'admin'), async (req, res) => {
   try {
-    const { name, serviceCharge, absorbCost, isActive, config } = req.body;
+    const { name, serviceCharge, payByCustomer, isActive, config } = req.body;
     const updateData = {};
     if (name) updateData.name = name.trim();
     if (serviceCharge !== undefined) updateData.service_charge = serviceCharge;
-    if (absorbCost !== undefined) updateData.absorb_cost = absorbCost;
+    if (payByCustomer !== undefined) updateData.pay_by_customer = payByCustomer;
     if (isActive !== undefined) updateData.is_active = isActive;
     if (config !== undefined) updateData.config = config;
     const { data, error } = await supabase.from('payment_methods').update(updateData).eq('id', req.params.id).eq('business_id', req.businessId).select().single();
@@ -206,14 +206,14 @@ router.put('/payment-methods/:id', requireRole('owner', 'admin'), async (req, re
 // POST /api/settings/discount-codes
 router.post('/discount-codes', requireRole('owner', 'admin'), async (req, res) => {
   try {
-    const { code, type, value } = req.body;
-    if (!code || !type || value === undefined) {
+    const { code, type, value, name, productIds } = req.body;
+    if (!code || !type || value === undefined || !name) {
       return res.status(400).json({ error: 'code, type and value required' });
     }
 
     const { data, error } = await supabase
       .from('discount_codes')
-      .insert({ business_id: req.businessId, code: code.trim().toUpperCase(), type, value })
+      .insert({ business_id: req.businessId, code: code.trim().toUpperCase(), type, value, name, product_ids: productIds||[] })
       .select()
       .single();
 
