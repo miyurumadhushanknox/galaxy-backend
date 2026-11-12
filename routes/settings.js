@@ -227,9 +227,13 @@ router.post('/discount-codes', requireRole('owner', 'admin'), async (req, res) =
 // PUT /api/settings/discount-codes/:id
 router.put('/discount-codes/:id', requireRole('owner', 'admin'), async (req, res) => {
   try {
-    const { active } = req.body;
+    const { active, name, code, type, value } = req.body;
     const updateData = {};
-    if (active !== undefined) updateData.is_active = active;
+       if (active !== undefined) updateData.is_active = active;
+       if (name !== undefined) updateData.name = name;
+       if (code !== undefined) updateData.code = code;
+       if (type !== undefined) updateData.type = type;
+       if (value !== undefined) updateData.value = value;
     const { data, error } = await supabase
       .from('discount_codes')
       .update(updateData)
