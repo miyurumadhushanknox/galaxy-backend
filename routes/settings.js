@@ -224,6 +224,26 @@ router.post('/discount-codes', requireRole('owner', 'admin'), async (req, res) =
   }
 });
 
+// PUT /api/settings/discount-codes/:id
+router.put('/discount-codes/:id', requireRole('owner', 'admin'), async (req, res) => {
+  try {
+    const { active } = req.body;
+    const updateData = {};
+    if (active !== undefined) updateData.active = active;
+    const { data, error } = await supabase
+      .from('discount_codes')
+      .update(updateData)
+      .eq('id', req.params.id)
+      .eq('business_id', req.businessId)
+      .select()
+      .single();
+    if (error) throw error;
+    res.json(data);
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
 // DELETE /api/settings/discount-codes/:id
 router.delete('/discount-codes/:id', requireRole('owner', 'admin'), async (req, res) => {
   try {
