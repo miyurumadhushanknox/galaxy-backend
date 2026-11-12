@@ -240,7 +240,6 @@ router.put('/discount-codes/:id', requireRole('owner', 'admin'), async (req, res
       .eq('id', req.params.id)
       .eq('business_id', req.businessId)
       .select()
-      .single();
     if (error) throw error;
     res.json(data);
   } catch (err) {
