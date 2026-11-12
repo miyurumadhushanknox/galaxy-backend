@@ -215,10 +215,9 @@ router.post('/discount-codes', requireRole('owner', 'admin'), async (req, res) =
       .from('discount_codes')
       .insert({ business_id: req.businessId, code: code.trim().toUpperCase(), type, value, name, product_ids: productIds||[] })
       .select()
-      .single();
 
     if (error) throw error;
-    res.status(201).json(data);
+    res.status(201).json(data[0]||data);
   } catch (err) {
     res.status(500).json({ error: 'Server error' });
   }
