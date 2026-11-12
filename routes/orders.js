@@ -119,7 +119,9 @@ router.post('/', requireRole('owner', 'admin', 'manager', 'sales'), async (req, 
       });
     }
 
-    const total = subtotal + (deliveryPrice || 0) - (discountAmount || 0);
+    const processingFeeVal = parseFloat(req.body.processing_fee) || 0;
+    const taxAmountVal = parseFloat(req.body.tax_amount) || 0;
+    const total = subtotal + (deliveryPrice || 0) - (discountAmount || 0) + processingFeeVal + taxAmountVal;
     const orderCode = await generateOrderCode(req.businessId);
 
     // Create order
@@ -141,7 +143,9 @@ router.post('/', requireRole('owner', 'admin', 'manager', 'sales'), async (req, 
         total,
         note: note?.trim(),
         added_by: req.user.id,
-        added_by_name: `${req.user.first_name} ${req.user.last_name}`
+        added_by_name: `${req.user.first_name} ${req.user.last_name}`,
+        processing_fee: parseFloat(req.body.processing_fee) || 0,
+        tax_amount: parseFloat(req.body.tax_amount) || 0
       })
       .select()
       .single();
