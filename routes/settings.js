@@ -229,7 +229,7 @@ router.put('/discount-codes/:id', requireRole('owner', 'admin'), async (req, res
   try {
     const { active } = req.body;
     const updateData = {};
-    if (active !== undefined) updateData.active = active;
+    if (active !== undefined) updateData.is_active = active;
     const { data, error } = await supabase
       .from('discount_codes')
       .update(updateData)
