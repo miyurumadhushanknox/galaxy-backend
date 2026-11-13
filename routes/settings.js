@@ -40,7 +40,7 @@ router.get('/', async (req, res) => {
       business: bizRes.data,
       deliveryMethods: deliveryRes.data || [],
       paymentMethods: paymentRes.data || [],
-      discountCodes: discountRes.data || []
+      discountCodes: (discountRes.data || []).map(d=>({...d, is_active: d.is_active !== false}))
     });
   } catch (err) {
     res.status(500).json({ error: 'Server error' });
