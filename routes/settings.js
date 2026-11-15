@@ -79,12 +79,13 @@ router.put('/general', requireRole('owner', 'admin'), async (req, res) => {
 // PUT /api/settings/business
 router.put('/business', requireRole('owner', 'admin'), async (req, res) => {
   try {
-    const { name, category, address, phone } = req.body;
+    const { name, category, address, phone, logo_url } = req.body;
     const updateData = { updated_at: new Date().toISOString() };
     if (name) updateData.name = name.trim();
     if (category !== undefined) updateData.category = category;
     if (address !== undefined) updateData.address = address.trim();
     if (phone !== undefined) updateData.phone = phone.trim();
+    if (logo_url !== undefined) updateData.logo_url = logo_url;
 
     const { data, error } = await supabase
       .from('businesses')
