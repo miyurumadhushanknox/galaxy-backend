@@ -51,7 +51,7 @@ router.get('/', async (req, res) => {
 router.put('/general', requireRole('owner', 'admin'), async (req, res) => {
   try {
     const { timezone, dateFormat, timeFormat, currency, theme, lowStockThreshold,
-            emailAlerts, orderAlerts, orderStatusAlerts, userAddAlerts, productAddAlerts, processingFee, processingFeeType, processingFeeEnabled } = req.body;
+            emailAlerts, orderAlerts, orderStatusAlerts, userAddAlerts, productAddAlerts, processingFee, processingFeeType, processingFeeEnabled, taxVat, taxVatType, taxVatEnabled } = req.body;
 
     const { data, error } = await supabase
       .from('business_settings')
@@ -63,6 +63,7 @@ router.put('/general', requireRole('owner', 'admin'), async (req, res) => {
         order_status_alerts: orderStatusAlerts, user_add_alerts: userAddAlerts,
         product_add_alerts: productAddAlerts,
         processing_fee: processingFee||0, processing_fee_type: processingFeeType||'fixed', processing_fee_enabled: processingFeeEnabled||false,
+        tax_vat: taxVat||0, tax_vat_type: taxVatType||'fixed', tax_vat_enabled: taxVatEnabled||false,
         updated_at: new Date().toISOString()
       }, { onConflict: 'business_id' })
       .select()
