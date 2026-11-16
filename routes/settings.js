@@ -162,7 +162,7 @@ router.delete('/delivery-methods/:id', requireRole('owner', 'admin'), async (req
 // POST /api/settings/payment-methods
 router.post('/payment-methods', requireRole('owner', 'admin'), async (req, res) => {
   try {
-    const { name, serviceCharge, absorbCost } = req.body;
+    const { name, serviceCharge, payByCustomer } = req.body;
     if (!name) return res.status(400).json({ error: 'Name is required' });
 
     const { data, error } = await supabase
@@ -227,7 +227,7 @@ router.post('/discount-codes', requireRole('owner', 'admin'), async (req, res) =
 });
 
 // PUT /api/settings/discount-codes/:id
-router.put('/discount-codes/:id', requireRole('owner', 'admin'), async (req, res) => {
+router.put('/settings/discount-codes/:id', requireRole('owner', 'admin'), async (req, res) => {
   try {
     const { active, name, code, type, value, product_ids } = req.body;
     const updateData = {};
@@ -251,7 +251,7 @@ router.put('/discount-codes/:id', requireRole('owner', 'admin'), async (req, res
 });
 
 // DELETE /api/settings/discount-codes/:id
-router.delete('/discount-codes/:id', requireRole('owner', 'admin'), async (req, res) => {
+router.delete('/settings/discount-codes/:id', requireRole('owner', 'admin'), async (req, res) => {
   try {
     await supabase.from('discount_codes').delete().eq('id', req.params.id).eq('business_id', req.businessId);
     res.json({ message: 'Deleted' });
