@@ -227,7 +227,7 @@ router.post('/discount-codes', requireRole('owner', 'admin'), async (req, res) =
 });
 
 // PUT /api/settings/discount-codes/:id
-router.put('/settings/discount-codes/:id', requireRole('owner', 'admin'), async (req, res) => {
+router.put('/discount-codes/:id', requireRole('owner', 'admin'), async (req, res) => {
   try {
     const { active, name, code, type, value, product_ids } = req.body;
     const updateData = {};
