@@ -222,6 +222,9 @@ router.post('/discount-codes', requireRole('owner', 'admin'), async (req, res) =
     if (error) throw error;
     res.status(201).json(data[0]||data);
   } catch (err) {
+    if (err.code === '23505') {
+      return res.status(409).json({ error: 'Discount code already exists' });
+    }
     res.status(500).json({ error: 'Server error' });
   }
 });
