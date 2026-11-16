@@ -29,7 +29,7 @@ router.get('/', async (req, res) => {
     const missing = systemTypes.filter(t => !existingTypes.includes(t.type));
     if (missing.length > 0) {
       await supabase.from('payment_methods').insert(
-        missing.map(t => ({ business_id: req.businessId, name: t.name, type: t.type, is_active: false, sort_order: t.sort_order, service_charge: 0, absorb_cost: false, config: {} }))
+        missing.map(t => ({ business_id: req.businessId, name: t.name, type: t.type, is_active: false, sort_order: t.sort_order, service_charge: 0, config: {} }))
       );
       const { data: refreshed } = await supabase.from('payment_methods').select('*').eq('business_id', req.businessId).order('sort_order');
       paymentRes.data = refreshed;
