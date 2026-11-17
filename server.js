@@ -33,6 +33,7 @@ app.use('/api/auth/login', authLimiter);
 // CORS - allow only your frontend
 const allowedOrigins = [
   process.env.FRONTEND_URL,
+  'https://galaxy-frontend-gilt.vercel.app',
   'http://localhost:5500',
   'http://127.0.0.1:5500',
   'http://localhost:3000',
