@@ -52,7 +52,7 @@ app.use(cors({
     callback(new Error('Not allowed by CORS'));
   },
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'x-knox-admin-key'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'x-knox-admin-key', 'x-bucket', 'x-file-name'],
   credentials: true
 }));
 
