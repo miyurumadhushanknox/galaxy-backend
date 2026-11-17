@@ -114,7 +114,7 @@ if (existingEmail) {
 });
 
 // PUT /api/users/profile - update own profile
-router.put('/profile', authenticate, async (req, res) => {
+router.put('/profile', async (req, res) => {
   try {
     const { firstName, lastName, phone } = req.body;
     const { error } = await supabase.from('users').update({
