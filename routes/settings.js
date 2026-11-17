@@ -67,7 +67,7 @@ router.post('/upload-avatar', requireRole('owner','admin','manager','accountant'
         const url = urlData.publicUrl;
 
         // Save avatar_url to users table
-        await supabase.from('users').update({ avatar_url: url }).eq('id', req.userId);
+        await supabase.from('users').update({ avatar_url: url }).eq('id', req.user.id);
 
         res.json({ url });
       } catch (e) {
