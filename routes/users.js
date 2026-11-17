@@ -125,7 +125,8 @@ router.put('/profile', async (req, res) => {
     updated_at: new Date().toISOString()
     }).eq('id', req.user.id);
     if (error) return res.status(500).json({ error: error.message });
-    res.json({ success: true });
+    const { data: updatedUser } = await supabase.from('users').select('*').eq('id', req.user.id).single();
+    res.json({ success: true, user: updatedUser });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
