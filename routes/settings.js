@@ -88,6 +88,22 @@ router.post('/upload-avatar', requireRole('owner','admin','manager','accountant'
   }
 });
 
+// PUT /api/settings/profile
+router.put('/profile', authenticate, async (req, res) => {
+  try {
+    const { firstName, lastName, phone } = req.body;
+    const { error } = await supabase.from('users').update({
+      first_name: firstName,
+      last_name: lastName,
+      phone: phone || null
+    }).eq('id', req.user.id);
+    if (error) return res.status(500).json({ error: error.message });
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // PUT /api/settings/general
 router.put('/general', requireRole('owner', 'admin'), async (req, res) => {
   try {
