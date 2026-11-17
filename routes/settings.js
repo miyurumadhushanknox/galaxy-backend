@@ -55,6 +55,9 @@ router.post('/upload-avatar', requireRole('owner','admin','manager','accountant'
     const contentType = req.headers['content-type'];
     if (!fileName) return res.status(400).json({ error: 'Missing file name' });
 
+    // Get old avatar URL before uploading new one
+    const { data: oldUser } = await supabase.from('users').select('avatar_url').eq('id', req.user.id).single();
+
     const chunks = [];
     req.on('data', chunk => chunks.push(chunk));
     req.on('end', async () => {
@@ -68,6 +71,12 @@ router.post('/upload-avatar', requireRole('owner','admin','manager','accountant'
 
         // Save avatar_url to users table
         await supabase.from('users').update({ avatar_url: url }).eq('id', req.user.id);
+
+        // Delete old avatar file from storage
+        if (oldUser?.avatar_url) {
+          const match = oldUser.avatar_url.match(/user-avatars\/(.+?)(\?|$)/);
+          if (match) await supabase.storage.from('user-avatars').remove([decodeURIComponent(match[1])]);
+        }
 
         res.json({ url });
       } catch (e) {
