@@ -47,6 +47,38 @@ router.get('/', async (req, res) => {
   }
 });
 
+// POST /upload-avatar
+router.post('/upload-avatar', requireRole('owner','admin','manager','accountant','stockkeeper','delivery','sales'), async (req, res) => {
+  try {
+    const bucket = req.headers['x-bucket'] || 'user-avatars';
+    const fileName = req.headers['x-file-name'];
+    const contentType = req.headers['content-type'];
+    if (!fileName) return res.status(400).json({ error: 'Missing file name' });
+
+    const chunks = [];
+    req.on('data', chunk => chunks.push(chunk));
+    req.on('end', async () => {
+      try {
+        const buffer = Buffer.concat(chunks);
+        const { error: upErr } = await supabase.storage.from(bucket).upload(fileName, buffer, { contentType, upsert: true });
+        if (upErr) return res.status(500).json({ error: upErr.message });
+
+        const { data: urlData } = supabase.storage.from(bucket).getPublicUrl(fileName);
+        const url = urlData.publicUrl;
+
+        // Save avatar_url to users table
+        await supabase.from('users').update({ avatar_url: url }).eq('id', req.userId);
+
+        res.json({ url });
+      } catch (e) {
+        res.status(500).json({ error: 'Upload failed' });
+      }
+    });
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
 // PUT /api/settings/general
 router.put('/general', requireRole('owner', 'admin'), async (req, res) => {
   try {
