@@ -116,12 +116,13 @@ if (existingEmail) {
 // PUT /api/users/profile - update own profile
 router.put('/profile', async (req, res) => {
   try {
-    const { firstName, lastName, phone } = req.body;
+    const { firstName, lastName, phone, employeeId } = req.body;
     const { error } = await supabase.from('users').update({
-      first_name: firstName,
-      last_name: lastName,
-      phone: phone || null,
-      updated_at: new Date().toISOString()
+    first_name: firstName,
+    last_name: lastName,
+    phone: phone || null,
+    employee_id: employeeId || null,
+    updated_at: new Date().toISOString()
     }).eq('id', req.user.id);
     if (error) return res.status(500).json({ error: error.message });
     res.json({ success: true });
