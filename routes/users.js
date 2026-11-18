@@ -135,7 +135,7 @@ router.put('/profile', async (req, res) => {
 // GET /api/users/profile-info
 router.get('/profile-info', async (req, res) => {
   try {
-    const { data: user } = await supabase.from('users').select('email,phone,employee_id').eq('id', req.user.id).single();
+    const { data: user } = await supabase.from('users').select('id, email').eq('email', email).single();
     res.json(user);
   } catch(err) {
     res.status(500).json({ error: err.message });

@@ -180,7 +180,7 @@ router.post('/forgot-password', async (req, res) => {
       html: `
         <div style="font-family:Arial,sans-serif;max-width:500px;margin:0 auto;">
           <h2>Password Reset</h2>
-          <p>Hi ${user.name},</p>
+          <p>Hi there,</p>
           <p>Click below to reset your password. Link expires in 1 hour.</p>
           <a href="${resetURL}" style="display:inline-block;padding:12px 24px;background:#e8441a;color:#fff;text-decoration:none;border-radius:8px;">Reset Password</a>
           <p style="margin-top:20px;color:#666;">If you didn't request this, ignore this email.</p>
