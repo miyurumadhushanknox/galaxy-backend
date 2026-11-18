@@ -18,7 +18,8 @@ app.use(helmet());
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 1000,
-  message: { error: 'Too many requests, please try again later.' }
+  message: { error: 'Too many requests, please try again later.' },
+  validate: { xForwardedForHeader: false }
 });
 app.use('/api/', limiter);
 
@@ -26,7 +27,8 @@ app.use('/api/', limiter);
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 20,
-  message: { error: 'Too many login attempts, please try again later.' }
+  message: { error: 'Too many login attempts, please try again later.' },
+  validate: { xForwardedForHeader: false }
 });
 app.use('/api/auth/login', authLimiter);
 
