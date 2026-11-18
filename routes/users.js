@@ -256,4 +256,30 @@ router.delete('/:id', requireRole('owner', 'admin'), async (req, res) => {
   }
 });
 
+async function sendPasswordReset() {
+  const email = document.getElementById('pf-reset-email').value;
+  if (!email) return alert('Enter your email first');
+
+  const btn = event.target.closest('button');
+  const original = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = 'Sending...';
+
+  try {
+    const res = await fetch('https://api.galaxylive.lk/api/auth/forgot-password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email })
+    });
+
+    const data = await res.json();
+    alert(data.message || 'Reset link sent! Check your email.');
+  } catch (err) {
+    alert('Failed to send reset link. Try again.');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = original;
+  }
+}
+
 module.exports = router;
