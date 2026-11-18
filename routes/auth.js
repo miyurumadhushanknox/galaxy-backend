@@ -147,7 +147,7 @@ router.post('/forgot-password', async (req, res) => {
 
     const { data: user } = await supabase
       .from('users')
-      .select('id, email, name')
+      .select('id, email')
       .eq('email', email)
       .single();
 
