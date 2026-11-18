@@ -220,14 +220,18 @@ router.post('/reset-password', async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    await supabase
-      .from('users')
-      .update({
-        password: hashedPassword,
-        reset_token: null,
-        reset_token_expires: null
-      })
-      .eq('id', user.id);
+    const { error: updateError } = await supabase
+    .from('users')
+    .update({
+      password: hashedPassword,
+      reset_token: null,
+      reset_token_expires: null
+    })
+    .eq('id', user.id);
+
+    if (updateError) {
+    return res.status(500).json({ error: 'Failed to update password' });
+    }
 
     res.json({ message: 'Password reset successful' });
   } catch (err) {
