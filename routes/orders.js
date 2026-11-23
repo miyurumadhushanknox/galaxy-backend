@@ -145,7 +145,9 @@ router.post('/', requireRole('owner', 'admin', 'manager', 'sales'), async (req, 
         added_by: req.user.id,
         added_by_name: `${req.user.first_name} ${req.user.last_name}`,
         processing_fee: parseFloat(req.body.processing_fee) || 0,
-        tax_amount: parseFloat(req.body.tax_amount) || 0
+        tax_amount: parseFloat(req.body.tax_amount) || 0,
+        items_total: parseFloat(req.body.items_total) || 0,
+        payment_service_charge: parseFloat(req.body.payment_service_charge) || 0
       })
       .select()
       .single();
