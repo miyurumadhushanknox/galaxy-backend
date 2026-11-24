@@ -158,6 +158,7 @@ router.post('/', requireRole('owner', 'admin', 'manager', 'sales'), async (req, 
     const orderItemsData = processedItems.map(item => ({
       business_id: req.businessId,
       order_id: order.id,
+      order_code: orderCode,
       product_id: item.productId,
       product_name: item.productName,
       product_code: item.productCode,
