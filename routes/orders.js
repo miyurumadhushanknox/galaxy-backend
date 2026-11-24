@@ -149,7 +149,8 @@ router.post('/', requireRole('owner', 'admin', 'manager', 'sales'), async (req, 
         processing_fee: parseFloat(req.body.processing_fee) || 0,
         tax_amount: parseFloat(req.body.tax_amount) || 0,
         items_total: parseFloat(req.body.items_total) || 0,
-        payment_service_charge: parseFloat(req.body.payment_service_charge) || 0
+        payment_service_charge: parseFloat(req.body.payment_service_charge) || 0,
+        walk_in: req.body.walk_in === true || req.body.walk_in === 'true' || false
       })
       .select()
       .single();
