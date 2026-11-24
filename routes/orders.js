@@ -104,7 +104,8 @@ router.post('/', requireRole('owner', 'admin', 'manager', 'sales'), async (req, 
         return res.status(404).json({ error: `Product not found: ${productId}` });
       }
 
-      const lineTotal = product.selling_price * item.quantity;
+      const unitPrice = parseFloat(item.unit_price) || product.selling_price;
+      const lineTotal = unitPrice * item.quantity;
       subtotal += lineTotal;
 
       processedItems.push({
@@ -113,7 +114,7 @@ router.post('/', requireRole('owner', 'admin', 'manager', 'sales'), async (req, 
         productName: product.name,
         productCode: product.code,
         purchasePrice: product.purchase_price,
-        sellingPrice: product.selling_price,
+        sellingPrice: unitPrice,
         quantity: item.quantity,
         lineTotal
       });
@@ -121,7 +122,8 @@ router.post('/', requireRole('owner', 'admin', 'manager', 'sales'), async (req, 
 
     const processingFeeVal = parseFloat(req.body.processing_fee) || 0;
     const taxAmountVal = parseFloat(req.body.tax_amount) || 0;
-    const total = subtotal + (deliveryPrice || 0) - (discountAmount || 0) + processingFeeVal + taxAmountVal;
+    const paymentServiceChargeVal = parseFloat(req.body.payment_service_charge) || 0;
+    const total = subtotal + (deliveryPrice || 0) - (discountAmount || 0) + processingFeeVal + taxAmountVal + paymentServiceChargeVal;
     const orderCode = await generateOrderCode(req.businessId);
 
     // Create order
