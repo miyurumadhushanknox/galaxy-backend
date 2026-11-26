@@ -182,7 +182,7 @@ router.post('/', requireRole('owner', 'admin', 'manager', 'sales'), async (req, 
       purchase_price: item.purchasePrice,
       selling_price: item.sellingPrice,
       quantity: item.quantity,
-      line_total: item.lineTotal
+      line_total: item.lineTotal,
       product_image: item.productImage || null
     }));
 
