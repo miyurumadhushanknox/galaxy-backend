@@ -23,7 +23,7 @@ router.get('/', async (req, res) => {
 
     let query = supabase
       .from('orders')
-      .select(`*, order_items(*)`)
+      .select(`*, order_items(*), payment_methods(id, name)`)
       .eq('business_id', req.businessId)
       .order('created_at', { ascending: false })
       .range(parseInt(offset), parseInt(offset) + parseInt(limit) - 1);
@@ -46,7 +46,7 @@ router.get('/:id', async (req, res) => {
   try {
     const { data, error } = await supabase
       .from('orders')
-      .select(`*, order_items(*)`)
+      .select('*, order_items(*), payment_methods(id, name)')
       .eq('id', req.params.id)
       .eq('business_id', req.businessId)
       .single();
