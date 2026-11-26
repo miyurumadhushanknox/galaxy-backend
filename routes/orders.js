@@ -23,7 +23,7 @@ router.get('/', async (req, res) => {
 
     let query = supabase
       .from('orders')
-      .select(`*, order_items(*), payment_methods(id, name)`)
+      .select(`*, order_items(*)`)
       .eq('business_id', req.businessId)
       .order('created_at', { ascending: false })
       .range(parseInt(offset), parseInt(offset) + parseInt(limit) - 1);
