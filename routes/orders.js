@@ -165,7 +165,7 @@ router.post('/', requireRole('owner', 'admin', 'manager', 'sales'), async (req, 
         payment_service_charge: parseFloat(req.body.payment_service_charge) || 0,
         walk_in: req.body.walk_in === true || req.body.walk_in === 'true' || false
       })
-      .select()
+      .select('*, order_items(*)')
       .single();
 
     if (orderError) throw orderError;
@@ -251,7 +251,14 @@ router.post('/', requireRole('owner', 'admin', 'manager', 'sales'), async (req, 
       }
     }
 
-    res.status(201).json(order);
+  // Fetch complete order with items after creation
+  const { data: fullOrder } = await supabase
+  .from('orders')
+  .select('*, order_items(*)')
+  .eq('id', order.id)
+  .eq('business_id', req.businessId)
+  .single();
+res.status(201).json(fullOrder || order);
   } catch (err) {
     console.error('Create order error:', err);
     res.status(500).json({ error: 'Server error' });
