@@ -95,7 +95,7 @@ router.post('/', requireRole('owner', 'admin', 'manager', 'sales'), async (req, 
       // Get product details (snapshot at time of order)
       const { data: product } = await supabase
         .from('products')
-        .select('id, name, code, selling_price, purchase_price')
+        .select('id, name, code, selling_price, purchase_price, images')
         .eq('id', productId)
         .eq('business_id', req.businessId)
         .single();
@@ -116,7 +116,8 @@ router.post('/', requireRole('owner', 'admin', 'manager', 'sales'), async (req, 
         purchasePrice: product.purchase_price,
         sellingPrice: unitPrice,
         quantity: item.quantity,
-        lineTotal
+        lineTotal,
+        productImage: (product.images && product.images[0]) || null
       });
     }
 
@@ -182,6 +183,7 @@ router.post('/', requireRole('owner', 'admin', 'manager', 'sales'), async (req, 
       selling_price: item.sellingPrice,
       quantity: item.quantity,
       line_total: item.lineTotal
+      product_image: item.productImage || null
     }));
 
     await supabase.from('order_items').insert(orderItemsData);
