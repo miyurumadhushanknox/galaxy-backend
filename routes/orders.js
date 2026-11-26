@@ -126,6 +126,17 @@ router.post('/', requireRole('owner', 'admin', 'manager', 'sales'), async (req, 
     const total = subtotal + (deliveryPrice || 0) - (discountAmount || 0) + processingFeeVal + taxAmountVal + paymentServiceChargeVal;
     const orderCode = await generateOrderCode(req.businessId);
 
+    // Look up payment method name
+    let paymentMethodName = null;
+    if (paymentMethod) {
+    const { data: pmData } = await supabase
+      .from('payment_methods')
+      .select('name')
+      .eq('id', paymentMethod)
+      .single();
+    paymentMethodName = pmData?.name || null;
+    }
+
     // Create order
     const { data: order, error: orderError } = await supabase
       .from('orders')
@@ -136,9 +147,11 @@ router.post('/', requireRole('owner', 'admin', 'manager', 'sales'), async (req, 
         customer_phone: customerPhone?.trim(),
         customer_city: customerCity?.trim(),
         customer_address: customerAddress?.trim(),
+        customer_phone2: customer_phone2?.trim() || null,
+        customer_email: customer_email?.trim() || null,
         delivery_method: deliveryMethod,
         delivery_price: deliveryPrice || 0,
-        payment_method: paymentMethod,
+        payment_method_name: paymentMethodName,
         discount_code: discountCode,
         discount_amount: discountAmount || 0,
         subtotal,
