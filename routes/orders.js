@@ -273,7 +273,7 @@ res.status(201).json(fullOrder || order);
 router.put('/:id/status', requireRole('owner', 'admin', 'manager', 'sales', 'delivery'), async (req, res) => {
   try {
     const { status, reason } = req.body;
-    const validStatuses = ['processing', 'ready', 'delivering', 'delivered', 'cancelled', 'returned', 'refunded'];
+      const validStatuses = ['processing', 'ready', 'delivering', 'onhold', 'rescheduled', 'delivered', 'cancelled', 'returned', 'refunded'];
 
     if (!validStatuses.includes(status)) {
       return res.status(400).json({ error: 'Invalid status' });
