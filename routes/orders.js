@@ -312,6 +312,7 @@ router.put('/:id', requireRole('owner', 'admin', 'manager', 'sales'), async (req
           product_code: item.code,
           purchase_price: ppMap[item.pid]?.pp||0,
           selling_price: ppMap[item.pid]?.sp||0,
+          actual_selling_price: item.price,
           quantity: item.qty,
           line_total: item.price * item.qty,
           product_image: item.image || null
