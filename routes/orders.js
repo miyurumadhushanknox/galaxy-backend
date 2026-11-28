@@ -301,8 +301,8 @@ router.put('/:id', requireRole('owner', 'admin', 'manager', 'sales'), async (req
     if (items && Array.isArray(items)) {
     await supabase.from('order_items').delete().eq('order_id', id).eq('business_id', req.businessId);
         const productIds = items.map(i => i.pid);
-        const { data: productsData } = await supabase.from('products').select('id, purchase_price').in('id', productIds).eq('business_id', req.businessId);
-        const ppMap = Object.fromEntries((productsData||[]).map(p=>[p.id, p.purchase_price]));
+        const { data: productsData } = await supabase.from('products').select('id, purchase_price, selling_price').in('id', productIds).eq('business_id', req.businessId);
+        const ppMap = Object.fromEntries((productsData||[]).map(p=>[p.id, {pp: p.purchase_price, sp: p.selling_price}]));
         const newItems = items.map(item => ({
           order_id: id,
           business_id: req.businessId,
@@ -310,8 +310,9 @@ router.put('/:id', requireRole('owner', 'admin', 'manager', 'sales'), async (req
           product_id: item.pid,
           product_name: item.name,
           product_code: item.code,
-          purchase_price: ppMap[item.pid]||0,
-          selling_price: item.price,
+          purchase_price: ppMap[item.pid]?.pp||0,
+          selling_price: ppMap[item.pid]?.sp||0,
+          actual_selling_price: item.price,
           quantity: item.qty,
           line_total: item.price * item.qty,
           product_image: item.image || null
