@@ -269,6 +269,26 @@ res.status(201).json(fullOrder || order);
   }
 });
 
+// PUT /api/orders/:id - update full order
+router.put('/:id', requireRole('owner', 'admin', 'manager', 'sales'), async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { items, customer, address, city, phone, phone2, email, note, delivery, payment, discount, deliveryCost, serviceCharge, tax, processingFee, total } = req.body;
+    const { data, error } = await supabase
+      .from('orders')
+      .update({ items, customer, address, city, phone, phone2, email, note, delivery, payment, discount, delivery_cost: deliveryCost, service_charge: serviceCharge, tax, processing_fee: processingFee, total, updated_at: new Date().toISOString() })
+      .eq('id', id)
+      .eq('store_id', req.user.store_id)
+      .select()
+      .single();
+    if (error) throw error;
+    if (!data) return res.status(404).json({ error: 'Order not found' });
+    res.json(data);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
 // PUT /api/orders/:id/status - update order status
 router.put('/:id/status', requireRole('owner', 'admin', 'manager', 'sales', 'delivery'), async (req, res) => {
   try {
