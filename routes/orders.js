@@ -276,7 +276,7 @@ router.put('/:id', requireRole('owner', 'admin', 'manager', 'sales'), async (req
     const { items, customer, city, phone, phone2, email, note, delivery, payment, discount, deliveryCost, serviceCharge, tax, processingFee, total } = req.body;
     const { data, error } = await supabase
       .from('orders')
-      .update({ items, customer, city, phone, phone2, email, note, delivery, payment, discount, delivery_cost: deliveryCost, service_charge: serviceCharge, tax, processing_fee: processingFee, total, updated_at: new Date().toISOString() })
+      .update({ items, customer_name: customer, customer_city: city, customer_phone: phone, customer_phone2: phone2, customer_email: email, note, delivery_method: delivery, payment_method: payment, discount_amount: discount, delivery_price: deliveryCost, payment_service_charge: serviceCharge, tax_amount: tax, processing_fee: processingFee, total, updated_at: new Date().toISOString() })
       .eq('id', id)
       .eq('business_id', req.businessId)
       .select()
