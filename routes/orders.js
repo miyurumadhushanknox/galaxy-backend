@@ -278,7 +278,7 @@ router.put('/:id', requireRole('owner', 'admin', 'manager', 'sales'), async (req
       .from('orders')
       .update({ items, customer, address, city, phone, phone2, email, note, delivery, payment, discount, delivery_cost: deliveryCost, service_charge: serviceCharge, tax, processing_fee: processingFee, total, updated_at: new Date().toISOString() })
       .eq('id', id)
-      .eq('store_id', req.user.store_id)
+      .eq('business_id', req.businessId)
       .select()
       .single();
     if (error) throw error;
