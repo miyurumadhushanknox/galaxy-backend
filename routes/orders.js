@@ -273,10 +273,10 @@ res.status(201).json(fullOrder || order);
 router.put('/:id', requireRole('owner', 'admin', 'manager', 'sales'), async (req, res) => {
   try {
     const { id } = req.params;
-    const { items, customer, address, city, phone, phone2, email, note, delivery, payment, discount, deliveryCost, serviceCharge, tax, processingFee, total } = req.body;
+    const { items, customer, city, phone, phone2, email, note, delivery, payment, discount, deliveryCost, serviceCharge, tax, processingFee, total } = req.body;
     const { data, error } = await supabase
       .from('orders')
-      .update({ items, customer, address, city, phone, phone2, email, note, delivery, payment, discount, delivery_cost: deliveryCost, service_charge: serviceCharge, tax, processing_fee: processingFee, total, updated_at: new Date().toISOString() })
+      .update({ items, customer, city, phone, phone2, email, note, delivery, payment, discount, delivery_cost: deliveryCost, service_charge: serviceCharge, tax, processing_fee: processingFee, total, updated_at: new Date().toISOString() })
       .eq('id', id)
       .eq('business_id', req.businessId)
       .select()
