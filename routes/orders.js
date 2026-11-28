@@ -298,7 +298,12 @@ router.put('/:id', requireRole('owner', 'admin', 'manager', 'sales'), async (req
       .single();
     if (error) throw error;
     if (!data) return res.status(404).json({ error: 'Order not found' });
-    res.json(data);
+    if (items && Array.isArray(items)) {
+    await supabase.from('order_items').delete().eq('order_id', id).eq('business_id', req.businessId);
+    const newItems = items.map(item => ({ order_id: id, business_id: req.businessId, order_code: data.order_code, product_id: item.pid, product_name: item.name, product_code: item.code, purchase_price: item.sp, selling_price: item.price, quantity: item.qty, line_total: item.price * item.qty, product_image: item.image || null }));
+    if (newItems.length) await supabase.from('order_items').insert(newItems);
+}
+res.json(data);
   } catch (e) {
     res.status(500).json({ error: e.message });
   }
